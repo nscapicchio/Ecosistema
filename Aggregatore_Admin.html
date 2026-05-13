@@ -99,7 +99,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gri-l);color:#
 
 /* ── MODAL HASH GENERATOR ── */
 #hash-modal{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1100;
   align-items:center;justify-content:center;padding:20px
 }
 #hash-modal.open{display:flex}
@@ -271,17 +271,27 @@ tbody td{padding:8px 11px;vertical-align:top}
              style="width:100%;padding:12px 14px;border:1.5px solid var(--bordo);border-radius:8px;font-size:15px;outline:none">
     </div>
     <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn btn-blu" onclick="generateHash()" style="flex:1">Genera chiave</button>
+      <button class="btn btn-blu" id="hash-gen-btn" onclick="generateHash()" style="flex:1">Genera chiave</button>
       <button class="btn btn-outline" onclick="closeHashModal()" style="flex:1">Annulla</button>
     </div>
-    <div class="hash-result" id="hash-result" onclick="copyHash()"></div>
-    <p id="hash-instructions" style="display:none;font-size:.79rem;color:var(--grigio);margin-top:8px;line-height:1.5">
-      ✅ Chiave copiata! Ora:<br>
-      1. Apri <code style="background:var(--gri-l);padding:1px 5px;border-radius:3px">Aggregatore_Admin.html</code> con un editor di testo<br>
-      2. Trova la riga <code style="background:var(--gri-l);padding:1px 5px;border-radius:3px">hash: 'INSERISCI_IL_TUO_HASH_QUI'</code><br>
-      3. Sostituisci il valore con la chiave copiata<br>
-      4. Salva e ricarica la pagina
-    </p>
+    <div id="hash-result-wrap" style="display:none;margin-top:14px">
+      <div style="font-size:.78rem;font-weight:700;color:var(--grigio);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">Chiave generata — copiala qui sotto:</div>
+      <input type="text" id="hash-result-input" readonly
+             style="width:100%;padding:10px 12px;border:1.5px solid var(--verde);border-radius:7px;font-family:monospace;font-size:11px;color:#1f2937;background:var(--vrd-l);cursor:text;outline:none"
+             onclick="this.select()">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-verde" id="copy-hash-btn" onclick="copyHash()" style="flex:1;padding:9px 16px;font-size:.85rem">📋 Copia chiave</button>
+      </div>
+      <div id="copy-ok" style="display:none;margin-top:6px;font-size:.78rem;color:var(--verde);font-weight:600">✅ Copiata negli appunti!</div>
+      <div style="background:var(--blu-l);border-left:3px solid var(--blu-m);border-radius:0 7px 7px 0;padding:10px 12px;margin-top:10px;font-size:.78rem;color:#1e3a5c;line-height:1.6">
+        <strong>Come usare la chiave:</strong><br>
+        1. Clicca "📋 Copia chiave" qui sopra<br>
+        2. Apri <code style="background:white;padding:1px 5px;border-radius:3px">Aggregatore_Admin.html</code> con un editor di testo<br>
+        3. Trova: <code style="background:white;padding:1px 5px;border-radius:3px">hash: '6985424b9e1aae21a7d66a85d75ec262dc01e01c84b8bbfc883eae00b0440e56'</code><br>
+        4. Sostituisci solo il testo tra apici con la chiave copiata<br>
+        5. Salva il file e caricalo di nuovo su GitHub
+      </div>
+    </div>
   </div>
 </div>
 
@@ -619,27 +629,51 @@ function openHashModal() { document.getElementById('hash-modal').classList.add('
 function closeHashModal() {
   document.getElementById('hash-modal').classList.remove('open');
   document.getElementById('hash-pw-input').value = '';
-  document.getElementById('hash-result').className = 'hash-result';
-  document.getElementById('hash-result').textContent = '';
-  document.getElementById('hash-instructions').style.display = 'none';
+  document.getElementById('hash-result-wrap').style.display = 'none';
+  document.getElementById('hash-result-input').value = '';
+  document.getElementById('copy-ok').style.display = 'none';
 }
 async function generateHash() {
   const pw = document.getElementById('hash-pw-input').value;
   if (pw.length < 8) { alert('Usa almeno 8 caratteri per una password sicura.'); return; }
-  const h = await pbkdf2(pw);
-  const resultEl = document.getElementById('hash-result');
-  resultEl.textContent = h;
-  resultEl.className = 'hash-result show';
-  resultEl.title = 'Clicca per copiare';
+  const btn = document.getElementById('hash-gen-btn');
+  btn.disabled = true; btn.textContent = 'Generazione...';
+  try {
+    const h = await pbkdf2(pw);
+    document.getElementById('hash-result-input').value = h;
+    document.getElementById('hash-result-wrap').style.display = 'block';
+    document.getElementById('copy-ok').style.display = 'none';
+    // Seleziona automaticamente il testo per facilitare la copia manuale
+    document.getElementById('hash-result-input').select();
+  } catch(err) {
+    alert('Errore nella generazione. Usa il browser aggiornato (Chrome, Safari o Edge).');
+  }
+  btn.disabled = false; btn.textContent = 'Genera chiave';
 }
 async function copyHash() {
-  const h = document.getElementById('hash-result').textContent;
+  const h = document.getElementById('hash-result-input').value;
+  if (!h) return;
+  let copied = false;
   try {
     await navigator.clipboard.writeText(h);
-    document.getElementById('hash-instructions').style.display = 'block';
+    copied = true;
   } catch(e) {
-    document.getElementById('hash-instructions').style.display = 'block';
+    // Fallback: seleziona il campo e usa execCommand
+    const inp = document.getElementById('hash-result-input');
+    inp.select(); inp.setSelectionRange(0, 99999);
+    try { copied = document.execCommand('copy'); } catch(_) {}
   }
+  const okEl = document.getElementById('copy-ok');
+  const btn = document.getElementById('copy-hash-btn');
+  if (copied) {
+    okEl.textContent = '✅ Copiata negli appunti!';
+    btn.textContent = '✅ Copiata!';
+    setTimeout(() => { btn.textContent = '📋 Copia chiave'; }, 2000);
+  } else {
+    okEl.textContent = '⚠ Copia manuale: seleziona il testo sopra e premi Cmd+C (Mac) o Ctrl+C (Windows)';
+    document.getElementById('hash-result-input').select();
+  }
+  okEl.style.display = 'block';
 }
 
 // ══════════════════════════════════════════════

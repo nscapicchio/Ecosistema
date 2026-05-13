@@ -210,6 +210,10 @@ tbody td{padding:8px 11px;vertical-align:top}
 .btn-outline:hover{border-color:var(--blu-m);color:var(--blu)}
 .btn:disabled{opacity:.35;cursor:not-allowed}
 
+/* ── BTN PRINT ROW ── */
+.btn-print-row{background:none;border:1.5px solid var(--bordo);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:.78rem;color:var(--grigio);transition:all .15s;white-space:nowrap}
+.btn-print-row:hover{border-color:var(--blu-m);color:var(--blu);background:var(--blu-l)}
+
 /* ── NOTA ── */
 .nota{background:var(--oro-l);border-left:3px solid var(--oro);border-radius:0 8px 8px 0;padding:9px 13px;font-size:.82rem;color:#7a5a10;margin-bottom:14px;line-height:1.5}
 .nota strong{color:#5a3e00}
@@ -391,7 +395,7 @@ tbody td{padding:8px 11px;vertical-align:top}
                 <th>#</th><th>Azienda</th><th>Referenti</th><th>Dimensione</th>
                 <th>Servizi principali</th><th>Settori</th><th>Competenze</th>
                 <th>Superpotere</th><th>Aspettative</th><th>Contributo eco.</th>
-                <th>Conoscenza</th>
+                <th>Conoscenza</th><th>PDF</th>
               </tr>
             </thead>
             <tbody id="table-body"></tbody>
@@ -413,6 +417,9 @@ tbody td{padding:8px 11px;vertical-align:top}
         <div class="azioni">
           <button class="btn btn-verde" onclick="esportaExcel()">
             📊 Scarica Excel (.xlsx)
+          </button>
+          <button class="btn btn-blu" onclick="stampaTutte()">
+            🖨 Stampa tutte le carte PDF
           </button>
           <button class="btn btn-blu" onclick="esportaJSONAgg()">
             📦 Esporta JSON aggregato
@@ -853,11 +860,12 @@ function renderTabella() {
       <td>${superHtml}</td>
       <td>${aspHtml}</td>
       <td>${c.contributo.length?`<div class="td-trunc" title="${esc(c.contributo[0])}">${esc(trunc(c.contributo[0]))}</div>`:'<span style="color:#9ca3af">—</span>'}</td>
-      <td>${medC?scalaHtml(parseFloat(medC))+`<span class="media-val">${medC}</span>`:'—'}</td>`;
+      <td>${medC?scalaHtml(parseFloat(medC))+`<span class="media-val">${medC}</span>`:'—'}</td>
+      <td onclick="event.stopPropagation()"><button class="btn-print-row" onclick="stampaCarta('${esc(normKey(c.azienda))}')">🖨 PDF</button></td>`;
     tbody.appendChild(tr);
     const trD = document.createElement('tr');
     trD.id='tr-detail-'+i; trD.className='tr-detail'; trD.style.display='none';
-    trD.innerHTML=`<td colspan="11"><div class="detail-inner"><div class="detail-header">Dettaglio — ${esc(c.azienda)}</div><div class="person-cards">${c.persone.map(renderPersonCard).join('')}</div></div></td>`;
+    trD.innerHTML=`<td colspan="12"><div class="detail-inner"><div class="detail-header">Dettaglio — ${esc(c.azienda)}</div><div class="person-cards">${c.persone.map(renderPersonCard).join('')}</div></div></td>`;
     tbody.appendChild(trD);
   });
 }
@@ -885,6 +893,150 @@ function renderPersonCard(p) {
     ${p.sogno?`<div class="pc-row"><span class="pc-lbl">Sogno: </span><em>${esc(trunc(p.sogno,80))}</em></div>`:''}
     <div class="pc-row" style="margin-top:5px;color:var(--grigio);font-size:.72rem">Conoscenza eco.: ${p.scala_conoscenza?p.scala_conoscenza+'/5':'—'} · Innovazione: ${p.scala_innovazione?p.scala_innovazione+'/5':'—'}</div>
   </div>`;
+}
+
+// ══════════════════════════════════════════════
+// STAMPA CARTA D'IDENTITÀ PDF
+// ══════════════════════════════════════════════
+
+function stampaCarta(key) {
+  const c = companies[key];
+  if (!c) return;
+  const X = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const medC = mediaArr(c.scale_conoscenza);
+  const medI = mediaArr(c.scale_innovazione);
+  const tagH = (v,cl) => `<span class="tag tag-${cl}">${X(v)}</span>`;
+  const tagsH = (arr,cl) => arr&&arr.length ? arr.map(v=>tagH(v,cl)).join('') : '<span class="vuoto">—</span>';
+  const dotsH = (val,max=5) => {
+    let h='<span class="punti">';
+    for(let i=1;i<=max;i++) h+=`<span class="punto ${i<=Math.round(val)?'on':''}"></span>`;
+    return h+'</span>';
+  };
+  const referentiH = c.persone.map(p=>`<div class="ref-row">${X(p.referente||'—')}${p.ruolo?`<span class="ref-sub"> · ${X(p.ruolo)}</span>`:''}${p.email?`<span class="ref-sub"> · ${X(p.email)}</span>`:''}</div>`).join('');
+  const aspH = c.aspettative.length ? c.aspettative.slice(0,5).map((a,i)=>`<div class="asp"><span class="asp-n">${i+1}</span><span>${X(a)}</span></div>`).join('') : '<span class="vuoto">—</span>';
+  const mese = new Date().toLocaleDateString('it-IT',{month:'long',year:'numeric'});
+  const oggi = new Date().toLocaleDateString('it-IT');
+
+  const html = `<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">
+<title>Carta d'Identità — ${X(c.azienda)}</title>
+<style>
+@page{size:A4;margin:10mm 12mm}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:9pt;color:#1f2937;background:white}
+
+.header{background:#1a3a5c;color:white;padding:11px 16px;display:flex;align-items:center;gap:12px;border-radius:6px 6px 0 0}
+.badge{width:34px;height:34px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.badge span{font-size:12pt;font-weight:900;color:#1a3a5c}
+.h-tit{font-size:11pt;font-weight:800}
+.h-sub{font-size:7.5pt;opacity:.7;margin-top:1px}
+
+.azienda-bar{background:#e8f0f8;padding:9px 16px;display:flex;align-items:baseline;justify-content:space-between;border-bottom:2.5px solid #1a3a5c}
+.az-nome{font-size:15pt;font-weight:900;color:#1a3a5c}
+.az-meta{font-size:7.5pt;color:#4b5563;text-align:right;line-height:1.6}
+.settori-bar{padding:5px 16px;background:#f4f6f9;border-bottom:1px solid #d1d9e4;font-size:7.5pt;color:#4b5563}
+
+.corpo{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #d1d9e4}
+.col{padding:12px 16px}
+.col-sx{border-right:1px solid #d1d9e4}
+
+.sez{margin-bottom:11px}
+.sez:last-child{margin-bottom:0}
+.sez-tit{font-size:6.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#2c5f8a;margin-bottom:4px;padding-bottom:2px;border-bottom:1px solid #e5e9f0}
+.sez-body{font-size:8pt;line-height:1.55;color:#374151}
+
+.tag{display:inline-block;border-radius:10px;padding:1px 7px;font-size:7pt;font-weight:600;margin:1px 1px 2px}
+.tag-blu{background:#e8f0f8;color:#1a3a5c}
+.tag-verde{background:#e6f4ec;color:#2e7d52}
+.tag-oro{background:#fff8dc;color:#7a5a10}
+.vuoto{color:#9ca3af;font-style:italic}
+.super-txt{font-style:italic;font-weight:700;color:#2e7d52;font-size:8.5pt;line-height:1.4}
+.ref-row{margin-bottom:2px;font-size:8pt}
+.ref-sub{color:#6b7280;font-size:7.5pt}
+.asp{display:flex;gap:6px;margin-bottom:4px;align-items:flex-start;font-size:8pt;line-height:1.4}
+.asp-n{background:#1a3a5c;color:white;border-radius:50%;width:13px;height:13px;display:flex;align-items:center;justify-content:center;font-size:6pt;font-weight:800;flex-shrink:0;margin-top:1px}
+
+.fondo{display:grid;grid-template-columns:1fr 1fr;padding:10px 16px;gap:16px;background:#f9fafb;border-bottom:1px solid #d1d9e4}
+.punti{display:flex;gap:3px;margin-top:3px}
+.punto{width:9px;height:9px;border-radius:50%;background:#d1d9e4}
+.punto.on{background:#2e7d52}
+.scala-val{font-size:7.5pt;color:#6b7280;margin-left:6px;margin-top:3px}
+.scala-row{display:flex;align-items:center}
+.cit{font-style:italic;color:#374151;font-size:8pt;line-height:1.45}
+.cit::before{content:'"'}
+.cit::after{content:'"'}
+
+.footer{padding:7px 16px;display:flex;justify-content:space-between;align-items:center;background:#1a3a5c;border-radius:0 0 6px 6px}
+.footer span{font-size:7pt;color:rgba(255,255,255,.65)}
+.footer strong{color:white}
+
+.btn-stampa{position:fixed;bottom:18px;right:18px;background:#1a3a5c;color:white;border:none;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);font-family:inherit}
+.btn-stampa:hover{background:#2c5f8a}
+@media print{.btn-stampa{display:none}body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+</style></head><body>
+
+<div class="header">
+  <div class="badge"><span>A+</span></div>
+  <div><div class="h-tit">Ecosistema A+ · Carta d'Identità Aziendale</div><div class="h-sub">Fase 1 Mappatura · ${mese}</div></div>
+</div>
+
+<div class="azienda-bar">
+  <div class="az-nome">${X(c.azienda)}</div>
+  <div class="az-meta">
+    ${c.dimensione?`${X(c.dimensione)}<br>`:''}
+    ${c.anno_fondazione?`Fondata nel ${X(c.anno_fondazione)}<br>`:''}
+    ${c.sito?`${X(c.sito)}<br>`:''}
+    ${c.persone.length} rispondent${c.persone.length===1?'e':'i'}
+  </div>
+</div>
+
+${c.settori&&c.settori.length?`<div class="settori-bar"><strong>Settori:</strong> ${c.settori.map(s=>X(s)).join(' · ')}</div>`:''}
+
+<div class="corpo">
+  <div class="col col-sx">
+    ${c.descrizione?`<div class="sez"><div class="sez-tit">Profilo aziendale</div><div class="sez-body">${X(c.descrizione)}</div></div>`:''}
+    <div class="sez"><div class="sez-tit">Servizi offerti</div><div class="sez-body">${tagsH(c.servizi,'blu')}</div></div>
+    <div class="sez"><div class="sez-tit">Referenti</div><div class="sez-body">${referentiH||'<span class="vuoto">—</span>'}</div></div>
+  </div>
+  <div class="col">
+    <div class="sez"><div class="sez-tit">Competenze chiave</div><div class="sez-body">${tagsH(c.competenze,'verde')}</div></div>
+    ${c.superpotere&&c.superpotere.length?`<div class="sez"><div class="sez-tit">Superpotere</div><div class="sez-body super-txt">${X(c.superpotere.join(' / '))}</div></div>`:''}
+    ${c.strumenti&&c.strumenti.length?`<div class="sez"><div class="sez-tit">Strumenti & Metodologie</div><div class="sez-body">${X(c.strumenti.join(' · '))}</div></div>`:''}
+    <div class="sez"><div class="sez-tit">Aspettative dall'ecosistema</div><div class="sez-body">${aspH}</div></div>
+  </div>
+</div>
+
+<div class="fondo">
+  <div>
+    ${c.contributo&&c.contributo.length?`<div class="sez"><div class="sez-tit">Contributo all'ecosistema</div><div class="sez-body cit">${X(c.contributo.join(' / '))}</div></div>`:''}
+    ${c.sogno&&c.sogno.length?`<div class="sez" style="margin-top:8px"><div class="sez-tit">Collaborazione sognata</div><div class="sez-body cit">${X(c.sogno.join(' / '))}</div></div>`:''}
+  </div>
+  <div>
+    ${c.impatti&&c.impatti.length?`<div class="sez"><div class="sez-tit">Impatti dichiarati</div><div class="sez-body">${tagsH(c.impatti,'oro')}</div></div>`:''}
+    ${medC?`<div class="sez" style="margin-top:8px"><div class="sez-tit">Conoscenza Ecosistema A+</div><div class="scala-row">${dotsH(parseFloat(medC))}<span class="scala-val">${medC}/5</span></div></div>`:''}
+    ${medI?`<div class="sez" style="margin-top:8px"><div class="sez-tit">Propensione all'innovazione</div><div class="scala-row">${dotsH(parseFloat(medI))}<span class="scala-val">${medI}/5</span></div></div>`:''}
+  </div>
+</div>
+
+<div class="footer">
+  <span><strong>Ecosistema A+</strong> · E-Way Soc. Coop. · Uso riservato</span>
+  <span>Generato il ${oggi}</span>
+</div>
+
+<button class="btn-stampa" onclick="window.print()">🖨 Stampa / Salva PDF</button>
+<script>setTimeout(()=>window.print(),600);<\/script>
+</body></html>`;
+
+  const w = window.open('','_blank','width=820,height=1000');
+  if (!w) { mostraToast('Abilita i popup per questo sito', true); return; }
+  w.document.write(html);
+  w.document.close();
+}
+
+function stampaTutte() {
+  const lista = getArr();
+  if (!lista.length) return;
+  lista.forEach((c, i) => setTimeout(() => stampaCarta(normKey(c.azienda)), i * 800));
+  mostraToast(`Apertura ${lista.length} carte…`);
 }
 
 // ══════════════════════════════════════════════

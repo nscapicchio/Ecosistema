@@ -465,7 +465,7 @@ tbody td{padding:8px 11px;vertical-align:top}
 // Per generare l'hash: usa "Genera chiave di accesso" nella schermata di login
 // ══════════════════════════════════════════════════════════
 const AUTH = {
-  hash:        'INSERISCI_IL_TUO_HASH_QUI',   // ← sostituisci con l'hash generato
+  hash:        '6985424b9e1aae21a7d66a85d75ec262dc01e01c84b8bbfc883eae00b0440e56',   // ← sostituisci con l'hash generato
   salt:        'EcosistemaAplus2026CentroDati',
   iterations:  100000,
   maxAttempts: 5,
@@ -536,7 +536,7 @@ async function checkPassword() {
   btn.textContent = '⏳ Verifica…';
 
   // Blocco se hash non configurato
-  if (AUTH.hash === 'INSERISCI_IL_TUO_HASH_QUI') {
+  if (AUTH.hash === '6985424b9e1aae21a7d66a85d75ec262dc01e01c84b8bbfc883eae00b0440e56') {
     showPwMsg('error', 'Accesso non configurato. Usa "Genera la tua chiave di accesso" qui sotto.');
     btn.disabled = false; btn.textContent = 'Accedi →';
     return;
@@ -1081,7 +1081,7 @@ function mostraToast(msg, errore=false) {
     showPwMsg('lockout', `Accesso bloccato. Riprova tra ${lockMin} minut${lockMin===1?'o':'i'}.`);
   }
   // Mostra avviso se hash non configurato
-  if (AUTH.hash === 'INSERISCI_IL_TUO_HASH_QUI') {
+  if (AUTH.hash === '6985424b9e1aae21a7d66a85d75ec262dc01e01c84b8bbfc883eae00b0440e56') {
     showPwMsg('error', 'Prima configurazione: usa il link qui sotto per generare la tua chiave di accesso.');
   }
   document.getElementById('pw-input').focus();

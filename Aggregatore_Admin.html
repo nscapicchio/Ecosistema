@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';">
+<title>Ecosistema A+ · Centro Dati</title>
+<style>
+:root{
+  --blu:#1a3a5c;--blu-m:#2c5f8a;--blu-l:#e8f0f8;
+  --verde:#2e7d52;--vrd-l:#e6f4ec;
+  --oro:#c8a020;--oro-l:#fff8dc;
+  --grigio:#6b7280;--gri-l:#f4f6f9;
+  --bordo:#d1d9e4;--rosso:#dc2626;--rss-l:#fef2f2;
+  --arancio:#c85c20;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--gri-l);color:#1f2937}
+
+/* ── SCHERMATA PASSWORD ── */
+#pw-screen{
+  position:fixed;inset:0;background:linear-gradient(135deg,var(--blu) 0%,var(--blu-m) 100%);
+  display:flex;align-items:center;justify-content:center;padding:20px;z-index:999
+}
+.pw-card{
+  background:white;border-radius:14px;padding:36px 32px;max-width:380px;width:100%;
+  box-shadow:0 8px 32px rgba(0,0,0,0.25)
+}
+.pw-logo{width:52px;height:52px;background:var(--blu);border-radius:50%;display:flex;
+  align-items:center;justify-content:center;margin:0 auto 18px;color:white;
+  font-size:20px;font-weight:900}
+.pw-card h1{font-size:1.15rem;font-weight:800;color:var(--blu);text-align:center;margin-bottom:4px}
+.pw-card .pw-sub{font-size:.82rem;color:var(--grigio);text-align:center;margin-bottom:24px}
+.pw-input-wrap{position:relative;margin-bottom:12px}
+.pw-input-wrap input{
+  width:100%;padding:13px 44px 13px 14px;border:1.5px solid var(--bordo);border-radius:8px;
+  font-size:16px;font-family:inherit;color:#1f2937;outline:none;transition:border-color .2s
+}
+.pw-input-wrap input:focus{border-color:var(--blu-m);box-shadow:0 0 0 3px rgba(44,95,138,.12)}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;
+  border:none;cursor:pointer;color:var(--grigio);font-size:16px;padding:4px;line-height:1}
+.pw-btn{
+  width:100%;padding:13px;background:var(--blu);color:white;border:none;border-radius:8px;
+  font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;margin-top:4px
+}
+.pw-btn:hover{background:var(--blu-m)}
+.pw-btn:disabled{opacity:.5;cursor:not-allowed}
+.pw-error{
+  background:var(--rss-l);border-left:3px solid var(--rosso);border-radius:0 6px 6px 0;
+  padding:9px 12px;font-size:.82rem;color:#7f1d1d;margin-top:10px;display:none
+}
+.pw-error.show{display:block}
+.pw-lockout{
+  background:var(--oro-l);border-left:3px solid var(--oro);border-radius:0 6px 6px 0;
+  padding:9px 12px;font-size:.82rem;color:#7a5a10;margin-top:10px;display:none
+}
+.pw-lockout.show{display:block}
+.pw-setup-link{
+  display:block;text-align:center;margin-top:18px;font-size:.75rem;color:var(--grigio);
+  cursor:pointer;text-decoration:underline;border:none;background:none
+}
+.pw-setup-link:hover{color:var(--blu)}
+
+/* ── MODAL INCOLLA JSON ── */
+#paste-modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;
+  align-items:center;justify-content:center;padding:20px
+}
+#paste-modal.open{display:flex}
+.modal-card{
+  background:white;border-radius:12px;max-width:620px;width:100%;
+  max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2)
+}
+.modal-header{
+  padding:18px 22px;border-bottom:1px solid var(--bordo);
+  display:flex;align-items:center;justify-content:space-between
+}
+.modal-header h3{font-size:1rem;font-weight:700;color:var(--blu)}
+.modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--grigio);
+  padding:4px;line-height:1}
+.modal-close:hover{color:var(--rosso)}
+.modal-body{padding:20px 22px}
+.modal-body p{font-size:.87rem;color:var(--grigio);margin-bottom:12px;line-height:1.5}
+.modal-body strong{color:var(--blu)}
+.modal-textarea{
+  width:100%;padding:12px;border:1.5px solid var(--bordo);border-radius:7px;
+  font-size:12.5px;font-family:monospace;resize:vertical;min-height:160px;
+  color:#1f2937;outline:none;transition:border-color .2s
+}
+.modal-textarea:focus{border-color:var(--blu-m)}
+.modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.modal-error{
+  background:var(--rss-l);border-left:3px solid var(--rosso);border-radius:0 6px 6px 0;
+  padding:8px 12px;font-size:.82rem;color:#7f1d1d;margin-top:10px;display:none
+}
+.modal-error.show{display:block}
+
+/* ── MODAL HASH GENERATOR ── */
+#hash-modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;
+  align-items:center;justify-content:center;padding:20px
+}
+#hash-modal.open{display:flex}
+.hash-card{background:white;border-radius:12px;max-width:500px;width:100%;padding:28px 24px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+.hash-card h3{font-size:1rem;font-weight:800;color:var(--blu);margin-bottom:8px}
+.hash-card p{font-size:.84rem;color:var(--grigio);margin-bottom:14px;line-height:1.5}
+.hash-result{
+  background:var(--gri-l);border:1.5px solid var(--bordo);border-radius:7px;padding:12px;
+  font-family:monospace;font-size:11.5px;word-break:break-all;color:#1f2937;
+  margin:12px 0;display:none;cursor:pointer
+}
+.hash-result.show{display:block}
+
+/* ── HEADER ── */
+.header{background:var(--blu);color:white;padding:20px 28px;display:flex;align-items:center;gap:14px}
+.header .badge{width:44px;height:44px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header .badge span{font-size:17px;font-weight:900;color:var(--blu)}
+.header h1{font-size:1.2rem;font-weight:700}
+.header p{font-size:.8rem;opacity:.75;margin-top:2px}
+.header .right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.status-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 13px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.btn-lock{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 14px;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-lock:hover{background:rgba(255,255,255,.22)}
+
+/* ── CONTAINER ── */
+.container{max-width:1300px;margin:0 auto;padding:24px 18px 60px}
+
+/* ── CARD ── */
+.card{background:white;border-radius:10px;box-shadow:0 2px 10px rgba(26,58,92,.08);margin-bottom:18px;overflow:hidden}
+.card-header{padding:14px 22px;border-bottom:1px solid var(--bordo);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-header h2{font-size:.93rem;font-weight:700;color:var(--blu)}
+.badge-count{background:var(--blu);color:white;border-radius:20px;padding:2px 10px;font-size:.73rem;font-weight:700}
+.card-body{padding:22px}
+
+/* ── IMPORTAZIONE ── */
+.import-actions{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.dropzone{
+  border:2.5px dashed var(--bordo);border-radius:10px;padding:34px 20px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--gri-l)
+}
+.dropzone:hover,.dropzone.drag-over{border-color:var(--blu-m);background:var(--blu-l)}
+.dropzone .icon{font-size:32px;margin-bottom:8px}
+.dropzone h3{font-size:.95rem;font-weight:600;color:var(--blu);margin-bottom:4px}
+.dropzone p{font-size:.83rem;color:var(--grigio)}
+.btn-upload{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 18px;background:var(--blu);color:white;border:none;border-radius:7px;font-size:.86rem;font-weight:600;cursor:pointer;transition:background .2s}
+.btn-upload:hover{background:var(--blu-m)}
+.dropzone input{display:none}
+.file-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.file-pill{display:flex;align-items:center;gap:6px;background:var(--vrd-l);border:1px solid rgba(46,125,82,.3);border-radius:20px;padding:3px 11px;font-size:.78rem;color:var(--verde);font-weight:600}
+.file-pill.errore{background:var(--rss-l);border-color:rgba(220,38,38,.3);color:var(--rosso)}
+.file-pill .rimuovi{cursor:pointer;opacity:.5;margin-left:3px;font-size:11px}
+.file-pill .rimuovi:hover{opacity:1}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-card{background:var(--gri-l);border-radius:8px;padding:14px;text-align:center;border:1px solid var(--bordo)}
+.stat-card .num{font-size:1.9rem;font-weight:800;color:var(--blu);line-height:1}
+.stat-card .label{font-size:.73rem;color:var(--grigio);margin-top:4px}
+.stat-card.verde .num{color:var(--verde)}
+.stat-card.oro .num{color:var(--oro)}
+
+/* ── TABELLA ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.81rem;min-width:980px}
+thead tr{background:var(--blu);color:white}
+thead th{padding:10px 11px;text-align:left;font-size:.73rem;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+tbody tr.tr-main{border-bottom:1px solid var(--bordo);cursor:pointer;transition:background .15s}
+tbody tr.tr-main:hover{background:var(--blu-l)}
+tbody tr.tr-main:nth-child(4n+1),tbody tr.tr-main:nth-child(4n+2){background:var(--gri-l)}
+tbody tr.tr-main:nth-child(4n+1):hover,tbody tr.tr-main:nth-child(4n+2):hover{background:var(--blu-l)}
+tbody td{padding:8px 11px;vertical-align:top}
+.tr-detail td{padding:0;background:#f8fbff;border-bottom:2px solid var(--blu-m)}
+.detail-inner{padding:14px 18px}
+.detail-header{font-size:.76rem;font-weight:700;color:var(--blu-m);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.person-cards{display:flex;flex-wrap:wrap;gap:10px}
+.person-card{background:white;border:1px solid var(--bordo);border-radius:8px;padding:12px;min-width:240px;max-width:340px;flex:1}
+.pc-head{font-weight:700;color:var(--blu);font-size:.86rem;margin-bottom:6px;display:flex;align-items:baseline;gap:5px}
+.pc-ruolo{font-size:.73rem;color:var(--grigio);font-weight:400}
+.pc-row{font-size:.78rem;margin-bottom:4px;line-height:1.4}
+.pc-lbl{font-weight:600;color:var(--grigio)}
+.pc-email{font-size:.73rem;color:var(--grigio);margin-top:2px}
+.td-nome{font-weight:700;color:var(--blu)}
+.td-nome-inner{display:flex;align-items:center;gap:5px}
+.toggle-icon{font-size:.63rem;color:var(--blu-m);flex-shrink:0;transition:transform .2s;display:inline-block}
+.toggle-icon.open{transform:rotate(90deg)}
+.persone-badge{background:var(--blu);color:white;border-radius:10px;padding:1px 7px;font-size:.67rem;font-weight:700;white-space:nowrap}
+.persone-badge.uno{background:var(--bordo);color:var(--grigio)}
+.td-tag{display:inline-block;background:var(--blu-l);color:var(--blu);border-radius:12px;padding:1px 7px;font-size:.7rem;font-weight:600;margin:1px}
+.td-tag.verde{background:var(--vrd-l);color:var(--verde)}
+.td-super{font-style:italic;color:var(--verde);font-weight:600;font-size:.79rem}
+.td-trunc{max-width:175px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scala-dot{display:inline-flex;gap:3px}
+.scala-dot span{width:7px;height:7px;border-radius:50%;background:var(--bordo)}
+.scala-dot span.on{background:var(--verde)}
+.row-num{color:var(--grigio);font-weight:700;text-align:center}
+.media-val{font-size:.7rem;color:var(--grigio);margin-left:3px}
+
+/* ── AZIONI ── */
+.azioni{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-verde{background:var(--verde);color:white}
+.btn-verde:hover{background:#236140}
+.btn-blu{background:var(--blu);color:white}
+.btn-blu:hover{background:var(--blu-m)}
+.btn-arancio{background:var(--arancio);color:white}
+.btn-arancio:hover{background:#a8481a}
+.btn-outline{background:transparent;color:var(--grigio);border:1.5px solid var(--bordo)}
+.btn-outline:hover{border-color:var(--blu-m);color:var(--blu)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── NOTA ── */
+.nota{background:var(--oro-l);border-left:3px solid var(--oro);border-radius:0 8px 8px 0;padding:9px 13px;font-size:.82rem;color:#7a5a10;margin-bottom:14px;line-height:1.5}
+.nota strong{color:#5a3e00}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:36px 20px;color:var(--grigio)}
+.empty-state .icon{font-size:38px;margin-bottom:8px}
+.empty-state p{font-size:.86rem}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--verde);color:white;border-radius:8px;padding:11px 18px;font-size:.86rem;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.15);transform:translateY(80px);opacity:0;transition:all .3s;z-index:999}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.errore{background:var(--rosso)}
+
+/* ── SESSION TIMER ── */
+.session-indicator{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:3px}
+.session-indicator.warn{color:#fcd34d}
+
+@media(max-width:640px){.stats-grid{grid-template-columns:1fr 1fr}.header{padding:14px 16px}.header .right .status-badge{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ══ SCHERMATA PASSWORD ══ -->
+<div id="pw-screen">
+  <div class="pw-card">
+    <div class="pw-logo">A+</div>
+    <h1>Ecosistema A+ · Centro Dati</h1>
+    <p class="pw-sub">Accesso riservato — inserisci la password per continuare</p>
+
+    <div class="pw-input-wrap">
+      <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')checkPassword()">
+      <button class="pw-toggle" type="button" tabindex="-1"
+              onclick="togglePwVisibility()" title="Mostra/nascondi">👁</button>
+    </div>
+    <button class="pw-btn" id="pw-btn" onclick="checkPassword()">Accedi →</button>
+
+    <div class="pw-error" id="pw-error"></div>
+    <div class="pw-lockout" id="pw-lockout"></div>
+
+    <button class="pw-setup-link" onclick="openHashModal()">
+      Prima volta o cambio password? Genera la tua chiave di accesso
+    </button>
+  </div>
+</div>
+
+<!-- ══ MODAL: GENERA HASH PASSWORD ══ -->
+<div id="hash-modal">
+  <div class="hash-card">
+    <h3>Configurazione accesso</h3>
+    <p>
+      Scegli una password robusta (almeno 12 caratteri, lettere + numeri + simboli).
+      Verrà convertita in una chiave crittografica da inserire nel file HTML.
+      <strong>La password non viene salvata da nessuna parte.</strong>
+    </p>
+    <div class="pw-input-wrap">
+      <input type="password" id="hash-pw-input" placeholder="Nuova password"
+             style="width:100%;padding:12px 14px;border:1.5px solid var(--bordo);border-radius:8px;font-size:15px;outline:none">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-blu" onclick="generateHash()" style="flex:1">Genera chiave</button>
+      <button class="btn btn-outline" onclick="closeHashModal()" style="flex:1">Annulla</button>
+    </div>
+    <div class="hash-result" id="hash-result" onclick="copyHash()"></div>
+    <p id="hash-instructions" style="display:none;font-size:.79rem;color:var(--grigio);margin-top:8px;line-height:1.5">
+      ✅ Chiave copiata! Ora:<br>
+      1. Apri <code style="background:var(--gri-l);padding:1px 5px;border-radius:3px">Aggregatore_Admin.html</code> con un editor di testo<br>
+      2. Trova la riga <code style="background:var(--gri-l);padding:1px 5px;border-radius:3px">hash: 'INSERISCI_IL_TUO_HASH_QUI'</code><br>
+      3. Sostituisci il valore con la chiave copiata<br>
+      4. Salva e ricarica la pagina
+    </p>
+  </div>
+</div>
+
+<!-- ══ APP PRINCIPALE ══ -->
+<div id="app" style="display:none">
+
+  <header class="header">
+    <div class="badge"><span>A+</span></div>
+    <div>
+      <h1>Ecosistema A+ · Centro Dati</h1>
+      <p>Gestione e analisi risposte · Fase 1 Mappatura</p>
+    </div>
+    <div class="right">
+      <div>
+        <div class="status-badge" id="header-count">0 aziende</div>
+        <div class="session-indicator" id="session-indicator">Sessione attiva</div>
+      </div>
+      <button class="btn-lock" onclick="lockSession()">🔒 Blocca</button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- IMPORTAZIONE -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📥 Importa risposte</h2>
+      </div>
+      <div class="card-body">
+        <div class="nota">
+          Puoi caricare i file JSON in due modi: <strong>trascina i file .json</strong> ricevuti per email,
+          oppure usa <strong>"Incolla JSON"</strong> per incollare direttamente il contenuto copiato dall'email —
+          senza salvare file intermedi. Le risposte della stessa azienda vengono fuse automaticamente.
+        </div>
+
+        <div class="import-actions">
+          <button class="btn btn-arancio" onclick="openPasteModal()">
+            📋 Incolla JSON dall'email
+          </button>
+          <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">
+            📂 Scegli file .json
+          </button>
+          <input type="file" id="file-input" accept=".json" multiple onchange="onFileSelect(event)" style="display:none">
+        </div>
+
+        <div class="dropzone" id="dropzone"
+             ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)"
+             onclick="document.getElementById('file-input').click()">
+          <div class="icon">📂</div>
+          <h3>Oppure trascina i file JSON qui</h3>
+          <p>Rilascia uno o più file .json per caricarli</p>
+        </div>
+
+        <div class="file-list" id="file-list"></div>
+      </div>
+    </div>
+
+    <!-- STATISTICHE -->
+    <div class="card" id="stats-card" style="display:none">
+      <div class="card-header">
+        <h2>📊 Riepilogo</h2>
+        <span class="badge-count" id="count-badge">0</span>
+      </div>
+      <div class="card-body">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="num" id="stat-aziende">0</div>
+            <div class="label">Aziende</div>
+          </div>
+          <div class="stat-card verde">
+            <div class="num" id="stat-persone">0</div>
+            <div class="label">Rispondenti</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="stat-settori">0</div>
+            <div class="label">Settori coperti</div>
+          </div>
+          <div class="stat-card oro">
+            <div class="num" id="stat-media">—</div>
+            <div class="label">Media conoscenza eco.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABELLA -->
+    <div class="card" id="table-card" style="display:none">
+      <div class="card-header">
+        <h2>🗂 Profili aziende</h2>
+        <span style="font-size:.76rem;color:var(--grigio);margin-left:4px">Clicca su una riga per i dettagli</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table id="main-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Azienda</th><th>Referenti</th><th>Dimensione</th>
+                <th>Servizi principali</th><th>Settori</th><th>Competenze</th>
+                <th>Superpotere</th><th>Aspettative</th><th>Contributo eco.</th>
+                <th>Conoscenza</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="card" id="export-card" style="display:none">
+      <div class="card-header">
+        <h2>⬇ Esporta</h2>
+      </div>
+      <div class="card-body">
+        <div class="nota">
+          <strong>Scarica Excel</strong> genera direttamente il file <em>.xlsx</em> con il foglio «Raccolta Dati»
+          già popolato (colonne B–W, riga 5) — pronto da aprire, senza passaggi intermedi.
+        </div>
+        <div class="azioni">
+          <button class="btn btn-verde" onclick="esportaExcel()">
+            📊 Scarica Excel (.xlsx)
+          </button>
+          <button class="btn btn-blu" onclick="esportaJSONAgg()">
+            📦 Esporta JSON aggregato
+          </button>
+          <button class="btn btn-outline" onclick="svuota()">
+            🗑 Svuota sessione
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <div class="empty-state" id="empty-state">
+      <div class="icon">📋</div>
+      <p>Nessun dato caricato.<br>Usa "Incolla JSON dall'email" o trascina i file .json ricevuti.</p>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /app -->
+
+<!-- ══ MODAL: INCOLLA JSON ══ -->
+<div id="paste-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>📋 Incolla JSON dall'email</h3>
+      <button class="modal-close" onclick="closePasteModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Nell'email ricevuta da Web3Forms, copia il contenuto del campo
+        <strong>JSON_per_Aggregatore</strong> e incollalo qui sotto.
+        Puoi incollare più JSON uno alla volta (un JSON per volta).
+      </p>
+      <textarea class="modal-textarea" id="paste-json-text"
+                placeholder='Incolla il JSON qui… es. {"azienda":"Esempio Srl","referente":"Mario Rossi",...}'></textarea>
+      <div class="modal-error" id="paste-error"></div>
+      <div class="modal-actions">
+        <button class="btn btn-verde" onclick="parsePastedJSON()">✓ Aggiungi</button>
+        <button class="btn btn-outline" onclick="closePasteModal()">Annulla</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CONFIGURAZIONE — modifica solo questa sezione
+// Per generare l'hash: usa "Genera chiave di accesso" nella schermata di login
+// ══════════════════════════════════════════════════════════
+const AUTH = {
+  hash:        'INSERISCI_IL_TUO_HASH_QUI',   // ← sostituisci con l'hash generato
+  salt:        'EcosistemaAplus2026CentroDati',
+  iterations:  100000,
+  maxAttempts: 5,
+  lockoutMs:   60 * 60 * 1000,   // 1 ora
+  sessionMs:   2 * 60 * 60 * 1000 // 2 ore
+};
+// ══════════════════════════════════════════════════════════
+
+// ── STATO ──
+let isAuthenticated = false;
+let loadedFiles    = [];
+let companies      = {};
+let lastActivity   = Date.now();
+let sessionInterval;
+
+// ── SECURITY: cancella dati alla chiusura/navigazione ──
+window.addEventListener('beforeunload', () => {
+  loadedFiles = []; companies = {};
+});
+
+// ── PBKDF2 HASH ──
+async function pbkdf2(password) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', hash:'SHA-256', salt:enc.encode(AUTH.salt), iterations:AUTH.iterations },
+    key, 256
+  );
+  return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── RATE LIMITING ──
+function getLockStatus() {
+  const until = parseInt(localStorage.getItem('_agg_lock')||'0');
+  if (Date.now() < until) return Math.ceil((until - Date.now()) / 60000);
+  return 0;
+}
+function recordFailedAttempt() {
+  const n = parseInt(localStorage.getItem('_agg_att')||'0') + 1;
+  if (n >= AUTH.maxAttempts) {
+    localStorage.setItem('_agg_lock', Date.now() + AUTH.lockoutMs);
+    localStorage.setItem('_agg_att', '0');
+    return -1; // locked
+  }
+  localStorage.setItem('_agg_att', n);
+  return AUTH.maxAttempts - n; // remaining
+}
+function clearRateLimit() {
+  localStorage.removeItem('_agg_att');
+  localStorage.removeItem('_agg_lock');
+}
+
+// ── CHECK PASSWORD ──
+async function checkPassword() {
+  const lockMin = getLockStatus();
+  if (lockMin > 0) {
+    showPwMsg('lockout', `Accesso bloccato. Riprova tra ${lockMin} minut${lockMin===1?'o':'i'}.`);
+    return;
+  }
+
+  const pw = document.getElementById('pw-input').value;
+  if (!pw) return;
+
+  const btn = document.getElementById('pw-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Verifica…';
+
+  // Blocco se hash non configurato
+  if (AUTH.hash === 'INSERISCI_IL_TUO_HASH_QUI') {
+    showPwMsg('error', 'Accesso non configurato. Usa "Genera la tua chiave di accesso" qui sotto.');
+    btn.disabled = false; btn.textContent = 'Accedi →';
+    return;
+  }
+
+  try {
+    const computed = await pbkdf2(pw);
+    if (computed === AUTH.hash) {
+      clearRateLimit();
+      document.getElementById('pw-input').value = '';
+      grantAccess();
+    } else {
+      const rem = recordFailedAttempt();
+      if (rem < 0) {
+        showPwMsg('lockout', `Troppi tentativi. Accesso bloccato per ${AUTH.lockoutMs/60000} minuti.`);
+      } else {
+        showPwMsg('error', `Password non valida. ${rem} tentativ${rem===1?'o':'i'} rimanent${rem===1?'e':'i'}.`);
+      }
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+    }
+  } catch(e) {
+    showPwMsg('error', 'Errore di sistema. Ricarica la pagina.');
+  }
+
+  btn.disabled = false; btn.textContent = 'Accedi →';
+}
+
+function showPwMsg(type, msg) {
+  const errEl  = document.getElementById('pw-error');
+  const lockEl = document.getElementById('pw-lockout');
+  errEl.className  = 'pw-error';
+  lockEl.className = 'pw-lockout';
+  if (type === 'error')   { errEl.textContent  = msg; errEl.classList.add('show'); }
+  if (type === 'lockout') { lockEl.textContent = msg; lockEl.classList.add('show'); }
+}
+
+function grantAccess() {
+  isAuthenticated = true;
+  lastActivity = Date.now();
+  document.getElementById('pw-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  aggiorna();
+  startSessionTimer();
+}
+
+function lockSession() {
+  isAuthenticated = false;
+  loadedFiles = []; companies = {};
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pw-screen').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-input').focus();
+  clearInterval(sessionInterval);
+}
+
+function startSessionTimer() {
+  clearInterval(sessionInterval);
+  sessionInterval = setInterval(() => {
+    if (!isAuthenticated) return;
+    const elapsed = Date.now() - lastActivity;
+    const remaining = AUTH.sessionMs - elapsed;
+    const indicator = document.getElementById('session-indicator');
+    if (remaining <= 0) {
+      lockSession(); return;
+    }
+    const mins = Math.floor(remaining / 60000);
+    if (mins < 15) {
+      indicator.textContent = `Sessione scade tra ${mins} min`;
+      indicator.className = 'session-indicator warn';
+    } else {
+      indicator.textContent = 'Sessione attiva';
+      indicator.className = 'session-indicator';
+    }
+  }, 30000);
+}
+
+// Rinnova sessione ad ogni interazione
+document.addEventListener('click',    () => { if(isAuthenticated) lastActivity = Date.now(); });
+document.addEventListener('keypress', () => { if(isAuthenticated) lastActivity = Date.now(); });
+
+// ── TOGGLE VISIBILITÀ PASSWORD ──
+function togglePwVisibility() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── HASH GENERATOR MODAL ──
+function openHashModal() { document.getElementById('hash-modal').classList.add('open'); }
+function closeHashModal() {
+  document.getElementById('hash-modal').classList.remove('open');
+  document.getElementById('hash-pw-input').value = '';
+  document.getElementById('hash-result').className = 'hash-result';
+  document.getElementById('hash-result').textContent = '';
+  document.getElementById('hash-instructions').style.display = 'none';
+}
+async function generateHash() {
+  const pw = document.getElementById('hash-pw-input').value;
+  if (pw.length < 8) { alert('Usa almeno 8 caratteri per una password sicura.'); return; }
+  const h = await pbkdf2(pw);
+  const resultEl = document.getElementById('hash-result');
+  resultEl.textContent = h;
+  resultEl.className = 'hash-result show';
+  resultEl.title = 'Clicca per copiare';
+}
+async function copyHash() {
+  const h = document.getElementById('hash-result').textContent;
+  try {
+    await navigator.clipboard.writeText(h);
+    document.getElementById('hash-instructions').style.display = 'block';
+  } catch(e) {
+    document.getElementById('hash-instructions').style.display = 'block';
+  }
+}
+
+// ══════════════════════════════════════════════
+// LOGICA AGGREGAZIONE
+// ══════════════════════════════════════════════
+
+function normKey(s) { return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function upsertPersona(dati) {
+  const key = normKey(dati.azienda);
+  if (!key) return false;
+  if (!companies[key]) {
+    companies[key] = {
+      azienda:dati.azienda, descrizione:dati.descrizione||'',
+      servizi:[...(dati.servizi||[])], settori:[...(dati.settori||[])],
+      tipo_clienti:dati.tipo_clienti||'', anno_fondazione:dati.anno_fondazione||'',
+      dimensione:dati.dimensione||'', sito:dati.sito||'',
+      persone:[], competenze:[], aspettative:[], superpotere:[],
+      impatti:[], strumenti:[], contributo:[], sogno:[], progetto:[],
+      scale_innovazione:[], scale_conoscenza:[],
+    };
+  }
+  const c = companies[key];
+  c.persone.push(dati);
+  const addU = (arr, items) => (items||[]).forEach(v => { if(v && !arr.includes(v)) arr.push(v); });
+  const addS = (arr, val)   => { if(val && !arr.includes(val)) arr.push(val); };
+  addU(c.competenze, dati.competenze);
+  addU(c.aspettative, dati.aspettative);
+  addU(c.impatti, dati.impatti);
+  addS(c.superpotere, dati.superpotere);
+  addS(c.strumenti,   dati.strumenti);
+  addS(c.progetto,    dati.progetto);
+  addS(c.contributo,  dati.contributo);
+  addS(c.sogno,       dati.sogno);
+  if (dati.scala_innovazione!=null) c.scale_innovazione.push(Number(dati.scala_innovazione));
+  if (dati.scala_conoscenza !=null) c.scale_conoscenza.push(Number(dati.scala_conoscenza));
+  if (!c.descrizione && dati.descrizione) c.descrizione = dati.descrizione;
+  if (!c.dimensione  && dati.dimensione)  c.dimensione  = dati.dimensione;
+  if (!c.sito        && dati.sito)        c.sito        = dati.sito;
+  addU(c.settori, dati.settori);
+  addU(c.servizi, dati.servizi);
+  return true;
+}
+
+function ricostruisci() { companies={}; loadedFiles.forEach(f=>upsertPersona(f.dati)); }
+function getArr()       { return Object.values(companies); }
+
+// ── DRAG & DROP + FILE INPUT ──
+function dragOver(e)  { e.preventDefault(); document.getElementById('dropzone').classList.add('drag-over'); }
+function dragLeave(e) { document.getElementById('dropzone').classList.remove('drag-over'); }
+function onDrop(e)    { e.preventDefault(); document.getElementById('dropzone').classList.remove('drag-over'); processaFiles([...e.dataTransfer.files]); }
+function onFileSelect(e) { processaFiles([...e.target.files]); e.target.value=''; }
+
+function processaFiles(files) {
+  const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+  if (!jsonFiles.length) { mostraToast('Nessun file .json trovato', true); return; }
+  jsonFiles.forEach(file => {
+    if (loadedFiles.find(f => f.name === file.name)) { mostraToast(`"${file.name}" già caricato`, true); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const dati = JSON.parse(ev.target.result);
+        if (!dati.azienda) throw new Error('Campo "azienda" mancante');
+        caricaDati(dati, file.name);
+        mostraToast(`Caricato: ${file.name}`);
+      } catch(err) {
+        aggiungaPill(file.name, true);
+        mostraToast(`Errore in ${file.name}: ${err.message}`, true);
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+function caricaDati(dati, nomeFile) {
+  loadedFiles.push({ name: nomeFile, dati });
+  upsertPersona(dati);
+  aggiungaPill(nomeFile, false);
+  aggiorna();
+}
+
+// ── INCOLLA JSON (MODALE) ──
+function openPasteModal() {
+  document.getElementById('paste-json-text').value = '';
+  document.getElementById('paste-error').className = 'modal-error';
+  document.getElementById('paste-modal').classList.add('open');
+  setTimeout(() => document.getElementById('paste-json-text').focus(), 100);
+}
+function closePasteModal() {
+  document.getElementById('paste-modal').classList.remove('open');
+  document.getElementById('paste-json-text').value = '';
+  document.getElementById('paste-error').className = 'modal-error';
+}
+function parsePastedJSON() {
+  const raw = document.getElementById('paste-json-text').value.trim();
+  const errEl = document.getElementById('paste-error');
+  errEl.className = 'modal-error';
+  if (!raw) { errEl.textContent = 'Incolla il contenuto JSON prima di procedere.'; errEl.classList.add('show'); return; }
+  try {
+    const dati = JSON.parse(raw);
+    if (!dati.azienda) throw new Error('Campo "azienda" non trovato. Verifica di aver copiato il JSON corretto.');
+    const nomeFile = `JSON_incollato_${esc(dati.azienda)}_${Date.now()}.json`;
+    caricaDati(dati, nomeFile);
+    closePasteModal();
+    mostraToast(`✓ ${dati.azienda} aggiunta`);
+  } catch(err) {
+    errEl.textContent = 'JSON non valido: ' + err.message;
+    errEl.classList.add('show');
+  }
+}
+
+// ── PILL FILES ──
+function pillId(nome) { return 'pill-' + nome.replace(/[^a-zA-Z0-9]/g,'_'); }
+function aggiungaPill(nome, errore) {
+  const list = document.getElementById('file-list');
+  const pill = document.createElement('div');
+  pill.className = 'file-pill' + (errore ? ' errore' : '');
+  pill.id = pillId(nome);
+  const label = nome.length > 40 ? nome.slice(0,37)+'…' : nome;
+  pill.innerHTML = `${errore?'⚠':'✓'} ${esc(label)} <span class="rimuovi" onclick="rimuovi('${esc(nome.replace(/'/g,"\\'"))}')">×</span>`;
+  list.appendChild(pill);
+}
+function rimuovi(nome) {
+  loadedFiles = loadedFiles.filter(f => f.name !== nome);
+  ricostruisci();
+  const pill = document.getElementById(pillId(nome));
+  if (pill) pill.remove();
+  aggiorna();
+}
+
+// ── AGGIORNA UI ──
+function aggiorna() {
+  const lista = getArr();
+  const n = lista.length;
+  const np = loadedFiles.length;
+  const hasData = n > 0;
+  ['empty-state','stats-card','table-card','export-card'].forEach(id => {
+    document.getElementById(id).style.display = (id==='empty-state') ? (hasData?'none':'block') : (hasData?'block':'none');
+  });
+  document.getElementById('header-count').textContent = `${n} aziend${n===1?'a':'e'} · ${np} risponden${np===1?'te':'ti'}`;
+  document.getElementById('count-badge').textContent = n;
+  document.getElementById('stat-aziende').textContent = n;
+  document.getElementById('stat-persone').textContent = np;
+  document.getElementById('stat-settori').textContent = new Set(lista.flatMap(a=>a.settori||[])).size;
+  const medie = lista.map(a => a.scale_conoscenza.length ? a.scale_conoscenza.reduce((s,v)=>s+v,0)/a.scale_conoscenza.length : null).filter(v=>v!==null);
+  document.getElementById('stat-media').textContent = medie.length ? (medie.reduce((a,b)=>a+b,0)/medie.length).toFixed(1) : '—';
+  renderTabella();
+}
+
+// ── TABELLA ──
+function scalaHtml(v, max=5) {
+  let h='<div class="scala-dot">';
+  for(let i=1;i<=max;i++) h+=`<span class="${i<=Math.round(v)?'on':''}"></span>`;
+  return h+'</div>';
+}
+function tags(arr, verde=false) {
+  if (!arr?.length) return '<span style="color:#9ca3af">—</span>';
+  return arr.map(t=>`<span class="td-tag${verde?' verde':''}">${esc(t)}</span>`).join('');
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function trunc(s,n=54) { s=String(s||''); return s.length>n?s.slice(0,n)+'…':s; }
+function mediaArr(arr) { if(!arr?.length) return null; return (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1); }
+
+function renderTabella() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  getArr().forEach((c,i) => {
+    const n    = c.persone.length;
+    const medC = mediaArr(c.scale_conoscenza);
+    const tr   = document.createElement('tr');
+    tr.id = 'tr-main-'+i; tr.className = 'tr-main';
+    tr.onclick = () => toggleDetail(i);
+    const referentiHtml = c.persone.map(p=>`<div>${esc(p.referente||'—')}${p.ruolo?`<span style="color:#9ca3af;font-size:.7rem"> · ${esc(p.ruolo)}</span>`:''}</div>`).join('');
+    const superHtml = c.superpotere.length ? c.superpotere.map(s=>`<div class="td-super">${esc(trunc(s,44))}</div>`).join('') : '<span style="color:#9ca3af">—</span>';
+    const aspHtml = c.aspettative.length ? c.aspettative.slice(0,3).map(a=>`<div style="font-size:.77rem;margin-bottom:2px">• ${esc(trunc(a,50))}</div>`).join('')+(c.aspettative.length>3?`<div style="font-size:.7rem;color:var(--grigio)">+${c.aspettative.length-3} altre…</div>`:'') : '<span style="color:#9ca3af">—</span>';
+    tr.innerHTML = `
+      <td class="row-num">${i+1}</td>
+      <td class="td-nome"><div class="td-nome-inner"><span class="toggle-icon" id="icon-${i}">▶</span>${esc(c.azienda)}<span class="persone-badge${n===1?' uno':''}">${n===1?'1 pers.':n+' pers.'}</span></div></td>
+      <td>${referentiHtml}</td>
+      <td style="white-space:nowrap">${esc(c.dimensione||'—')}</td>
+      <td>${tags(c.servizi)}</td>
+      <td>${tags(c.settori)}</td>
+      <td>${tags(c.competenze,true)}</td>
+      <td>${superHtml}</td>
+      <td>${aspHtml}</td>
+      <td>${c.contributo.length?`<div class="td-trunc" title="${esc(c.contributo[0])}">${esc(trunc(c.contributo[0]))}</div>`:'<span style="color:#9ca3af">—</span>'}</td>
+      <td>${medC?scalaHtml(parseFloat(medC))+`<span class="media-val">${medC}</span>`:'—'}</td>`;
+    tbody.appendChild(tr);
+    const trD = document.createElement('tr');
+    trD.id='tr-detail-'+i; trD.className='tr-detail'; trD.style.display='none';
+    trD.innerHTML=`<td colspan="11"><div class="detail-inner"><div class="detail-header">Dettaglio — ${esc(c.azienda)}</div><div class="person-cards">${c.persone.map(renderPersonCard).join('')}</div></div></td>`;
+    tbody.appendChild(trD);
+  });
+}
+
+function toggleDetail(i) {
+  const trD = document.getElementById('tr-detail-'+i);
+  const icon = document.getElementById('icon-'+i);
+  if (!trD) return;
+  const shown = trD.style.display !== 'none';
+  trD.style.display = shown ? 'none' : 'table-row';
+  if (icon) icon.classList.toggle('open', !shown);
+}
+
+function renderPersonCard(p) {
+  const comp = (p.competenze||[]).map(c=>esc(c)).join(', ')||'—';
+  const asp  = (p.aspettative||[]).map((a,i)=>`${i+1}. ${esc(a)}`).join('<br>')||'—';
+  return `<div class="person-card">
+    <div class="pc-head">${esc(p.referente||'—')}<span class="pc-ruolo">${esc(p.ruolo||'')}</span></div>
+    ${p.email?`<div class="pc-email">${esc(p.email)}</div>`:''}
+    <div style="height:6px"></div>
+    <div class="pc-row"><span class="pc-lbl">Competenze: </span>${comp}</div>
+    <div class="pc-row"><span class="pc-lbl">Superpotere: </span><em style="color:var(--verde)">${esc(p.superpotere||'—')}</em></div>
+    <div class="pc-row"><span class="pc-lbl">Aspettative:</span><br>${asp}</div>
+    ${p.contributo?`<div class="pc-row"><span class="pc-lbl">Contributo: </span>${esc(trunc(p.contributo,80))}</div>`:''}
+    ${p.sogno?`<div class="pc-row"><span class="pc-lbl">Sogno: </span><em>${esc(trunc(p.sogno,80))}</em></div>`:''}
+    <div class="pc-row" style="margin-top:5px;color:var(--grigio);font-size:.72rem">Conoscenza eco.: ${p.scala_conoscenza?p.scala_conoscenza+'/5':'—'} · Innovazione: ${p.scala_innovazione?p.scala_innovazione+'/5':'—'}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// EXPORT EXCEL .XLSX — implementazione pura JS
+// Formato Open XML (xlsx) via ZIP store-only
+// ══════════════════════════════════════════════
+
+// ── CRC-32 ──
+const _CRC_TBL = (() => {
+  const t = new Uint32Array(256);
+  for (let i=0; i<256; i++) { let c=i; for (let j=8; j; j--) c=c&1?0xEDB88320^(c>>>1):(c>>>1); t[i]=c; }
+  return t;
+})();
+function crc32(buf) {
+  let c=-1;
+  for (let i=0; i<buf.length; i++) c=_CRC_TBL[(c^buf[i])&0xFF]^(c>>>8);
+  return (c^-1)>>>0;
+}
+
+// ── ZIP STORE MODE ──
+function buildZip(files) {
+  // files: [{path:string, text:string}]
+  const enc = new TextEncoder();
+  const parts=[]; const cd=[]; let off=0;
+  for (const f of files) {
+    const nameU8 = enc.encode(f.path);
+    const dataU8 = enc.encode(f.text);
+    const crc    = crc32(dataU8);
+    const sz     = dataU8.length;
+    // Local file header (30 + name)
+    const lh = new Uint8Array(30 + nameU8.length);
+    const lv = new DataView(lh.buffer);
+    lv.setUint32(0,0x04034B50,true); lv.setUint16(4,20,true);
+    lv.setUint16(6,0,true); lv.setUint16(8,0,true);   // store
+    lv.setUint16(10,0,true); lv.setUint16(12,0,true);
+    lv.setUint32(14,crc,true); lv.setUint32(18,sz,true); lv.setUint32(22,sz,true);
+    lv.setUint16(26,nameU8.length,true); lv.setUint16(28,0,true);
+    lh.set(nameU8,30);
+    // Central dir entry (46 + name)
+    const ce = new Uint8Array(46 + nameU8.length);
+    const cv = new DataView(ce.buffer);
+    cv.setUint32(0,0x02014B50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true);
+    cv.setUint16(8,0,true); cv.setUint16(10,0,true); cv.setUint16(12,0,true); cv.setUint16(14,0,true);
+    cv.setUint32(16,crc,true); cv.setUint32(20,sz,true); cv.setUint32(24,sz,true);
+    cv.setUint16(28,nameU8.length,true); cv.setUint16(30,0,true); cv.setUint16(32,0,true);
+    cv.setUint16(34,0,true); cv.setUint16(36,0,true); cv.setUint32(38,0,true);
+    cv.setUint32(42,off,true);
+    ce.set(nameU8,46);
+    cd.push(ce); parts.push(lh,dataU8); off += lh.length + sz;
+  }
+  const cdSz = cd.reduce((a,b)=>a+b.length,0);
+  const eocd = new Uint8Array(22); const ev = new DataView(eocd.buffer);
+  ev.setUint32(0,0x06054B50,true);
+  ev.setUint16(4,0,true); ev.setUint16(6,0,true);
+  ev.setUint16(8,files.length,true); ev.setUint16(10,files.length,true);
+  ev.setUint32(12,cdSz,true); ev.setUint32(16,off,true); ev.setUint16(20,0,true);
+  const all=[...parts,...cd,eocd];
+  const tot=all.reduce((a,b)=>a+b.length,0);
+  const out=new Uint8Array(tot); let pos=0;
+  for(const a of all){ out.set(a,pos); pos+=a.length; }
+  return out;
+}
+
+// ── XML ESCAPE ──
+function xe(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;'); }
+
+// ── BUILD XLSX ──
+function buildXlsx(headers, dataRows) {
+  // Shared strings dictionary
+  const strings=[]; const idx={};
+  function si(s){ s=String(s??''); if(!(s in idx)){ idx[s]=strings.length; strings.push(s); } return idx[s]; }
+  headers.forEach(h=>si(h));
+  dataRows.forEach(r=>r.forEach(v=>si(String(v??''))));
+
+  const ssXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${strings.length}" uniqueCount="${strings.length}">\n`
+    + strings.map(s=>`<si><t xml:space="preserve">${xe(s)}</t></si>`).join('\n')
+    + `\n</sst>`;
+
+  // Column letter helper
+  function colL(n){ let s=''; while(n>=0){ s=String.fromCharCode(65+(n%26))+s; n=Math.floor(n/26)-1; } return s; }
+
+  // Worksheet
+  let ws = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">\n`;
+  ws += `<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>\n`;
+  // Column widths (22 columns)
+  const widths=[5,22,20,12,35,20,20,20,26,22,22,22,30,26,28,28,28,30,28,9,24,26];
+  ws += `<cols>\n` + widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('\n') + `\n</cols>\n`;
+  ws += `<sheetData>\n`;
+  // Row 1: headers (bold via style s="1")
+  ws += `<row r="1">\n` + headers.map((h,i)=>`<c r="${colL(i)}1" t="s" s="1"><v>${si(h)}</v></c>`).join('') + `</row>\n`;
+  // Data rows starting at row 5 (to align with template B5)
+  // We start at row 2 here (row 1 is header); the note says B5 in the xlsx template
+  // We'll start data at row 2 in our standalone xlsx (simpler), annotating clearly
+  dataRows.forEach((row,ri) => {
+    const r=ri+2;
+    ws += `<row r="${r}">` + row.map((v,i)=>`<c r="${colL(i)}${r}" t="s"><v>${si(String(v??''))}</v></c>`).join('') + `</row>\n`;
+  });
+  ws += `</sheetData>\n</worksheet>`;
+
+  // Styles: xf 0=normal, 1=bold+fill header
+  const styXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1A3A5C"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>`;
+
+  return buildZip([
+    {path:'[Content_Types].xml', text:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`},
+    {path:'_rels/.rels', text:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+    {path:'xl/workbook.xml', text:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Raccolta Dati" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+    {path:'xl/_rels/workbook.xml.rels', text:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+    {path:'xl/worksheets/sheet1.xml', text:ws},
+    {path:'xl/sharedStrings.xml',     text:ssXml},
+    {path:'xl/styles.xml',            text:styXml},
+  ]);
+}
+
+// ── DEFINIZIONE COLONNE (allineate al template Excel B–W) ──
+const COLS = [
+  ['#',                               (c,i) => i+1],
+  ['Azienda',                         c => c.azienda],
+  ['Referente',                       c => c.persone.map(p=>[p.referente,p.ruolo].filter(Boolean).join(' · ')).join(' | ')],
+  ['Dimensione',                      c => c.dimensione],
+  ['Descrizione azienda (2-3 frasi)', c => c.descrizione],
+  ['Servizio 1',                      c => c.servizi?.[0]||''],
+  ['Servizio 2',                      c => c.servizi?.[1]||''],
+  ['Servizio 3',                      c => c.servizi?.[2]||''],
+  ['Settori di mercato',              c => (c.settori||[]).join(' | ')],
+  ['Competenza 1',                    c => c.competenze?.[0]||''],
+  ['Competenza 2',                    c => c.competenze?.[1]||''],
+  ['Competenza 3',                    c => c.competenze?.[2]||''],
+  ['Superpotere',                     c => c.superpotere.join(' / ')],
+  ['Strumenti / Metodologie',         c => c.strumenti.join(' / ')],
+  ['Aspettativa 1 (priorità)',        c => c.aspettative?.[0]||''],
+  ['Aspettativa 2',                   c => c.aspettative?.[1]||''],
+  ['Aspettativa 3',                   c => c.aspettative?.[2]||''],
+  ["Contributo all'ecosistema",       c => c.contributo.join(' / ')],
+  ['Collaborazione sognata',          c => c.sogno.join(' / ')],
+  ['Conoscenza eco. (1-5)',           c => mediaArr(c.scale_conoscenza)||''],
+  ['Impatti dichiarati',              c => (c.impatti||[]).join(' | ')],
+  ['Note',                            c => c.persone.map(p=>p.note||'').filter(Boolean).join(' | ')],
+];
+
+function esportaExcel() {
+  const lista = getArr();
+  if (!lista.length) return;
+  const headers  = COLS.map(([h])=>h);
+  const dataRows = lista.map((c,i) => COLS.map(([,fn])=>fn(c,i)));
+  const xlsxBytes = buildXlsx(headers, dataRows);
+  const blob = new Blob([xlsxBytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  scarica(blob, `EcosistemaAplus_RaccoltaDati_${today()}.xlsx`);
+  mostraToast('Excel scaricato — ' + lista.length + ' aziende');
+}
+
+function esportaJSONAgg() {
+  const lista = getArr();
+  if (!lista.length) return;
+  const blob = new Blob([JSON.stringify({fase:1,export:new Date().toISOString(),totale_aziende:lista.length,totale_rispondenti:loadedFiles.length,aziende:lista},null,2)],{type:'application/json'});
+  scarica(blob, `EcosistemaAplus_Aggregato_${today()}.json`);
+  mostraToast('JSON aggregato esportato');
+}
+
+function svuota() {
+  if (!confirm('Svuotare tutti i dati della sessione corrente?')) return;
+  loadedFiles=[]; companies={};
+  document.getElementById('file-list').innerHTML='';
+  aggiorna();
+}
+
+// ── UTILS ──
+function scarica(blob, nome) {
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=nome;
+  a.style.cssText='position:fixed;top:-200px;left:-200px;opacity:0';
+  document.body.appendChild(a);
+  setTimeout(()=>{ a.click(); setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },1000); },100);
+}
+function today() { return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+function mostraToast(msg, errore=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(errore?' errore':'');
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ── INIT ──
+(function(){
+  // Controlla lockout all'avvio
+  const lockMin = getLockStatus();
+  if (lockMin > 0) {
+    showPwMsg('lockout', `Accesso bloccato. Riprova tra ${lockMin} minut${lockMin===1?'o':'i'}.`);
+  }
+  // Mostra avviso se hash non configurato
+  if (AUTH.hash === 'INSERISCI_IL_TUO_HASH_QUI') {
+    showPwMsg('error', 'Prima configurazione: usa il link qui sotto per generare la tua chiave di accesso.');
+  }
+  document.getElementById('pw-input').focus();
+})();
+</script>
+</body>
+</html>

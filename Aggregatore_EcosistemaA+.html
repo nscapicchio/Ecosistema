@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Ecosistema A+ · Aggregatore Dati</title>
+<style>
+:root {
+  --blu:    #1a3a5c;
+  --blu-m:  #2c5f8a;
+  --blu-l:  #e8f0f8;
+  --verde:  #2e7d52;
+  --vrd-l:  #e6f4ec;
+  --oro:    #c8a020;
+  --oro-l:  #fff8dc;
+  --grigio: #6b7280;
+  --gri-l:  #f4f6f9;
+  --bordo:  #d1d9e4;
+  --bianco: #ffffff;
+  --rosso:  #dc2626;
+  --rss-l:  #fef2f2;
+  --arancio:#c85c20;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gri-l); color: #1f2937; }
+
+/* ── HEADER ── */
+.header { background: var(--blu); color: white; padding: 22px 32px; display: flex; align-items: center; gap: 16px; }
+.header .badge { width: 46px; height: 46px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.header .badge span { font-size: 18px; font-weight: 900; color: var(--blu); }
+.header h1 { font-size: 1.3rem; font-weight: 700; }
+.header p { font-size: 0.82rem; opacity: 0.75; margin-top: 2px; }
+.header .status-badge { margin-left: auto; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+
+/* ── CONTAINER ── */
+.container { max-width: 1300px; margin: 0 auto; padding: 28px 20px 60px; }
+
+/* ── CARD ── */
+.card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(26,58,92,0.08); margin-bottom: 20px; overflow: hidden; }
+.card-header { padding: 16px 24px; border-bottom: 1px solid var(--bordo); display: flex; align-items: center; gap: 10px; }
+.card-header h2 { font-size: 0.95rem; font-weight: 700; color: var(--blu); }
+.card-header .badge-count { background: var(--blu); color: white; border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; font-weight: 700; }
+.card-body { padding: 24px; }
+
+/* ── DROP ZONE ── */
+.dropzone {
+  border: 2.5px dashed var(--bordo);
+  border-radius: 10px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--gri-l);
+}
+.dropzone:hover, .dropzone.drag-over {
+  border-color: var(--blu-m);
+  background: var(--blu-l);
+}
+.dropzone .icon { font-size: 36px; margin-bottom: 10px; }
+.dropzone h3 { font-size: 1rem; font-weight: 600; color: var(--blu); margin-bottom: 6px; }
+.dropzone p { font-size: 0.85rem; color: var(--grigio); }
+.dropzone input { display: none; }
+.btn-upload { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 20px; background: var(--blu); color: white; border: none; border-radius: 7px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-upload:hover { background: var(--blu-m); }
+
+/* ── FILE PILLS ── */
+.file-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.file-pill { display: flex; align-items: center; gap: 6px; background: var(--vrd-l); border: 1px solid rgba(46,125,82,0.3); border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; color: var(--verde); font-weight: 600; }
+.file-pill.errore { background: var(--rss-l); border-color: rgba(220,38,38,0.3); color: var(--rosso); }
+.file-pill .rimuovi { cursor: pointer; opacity: 0.6; margin-left: 4px; font-size: 12px; }
+.file-pill .rimuovi:hover { opacity: 1; }
+
+/* ── STATS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.stat-card { background: var(--gri-l); border-radius: 8px; padding: 16px; text-align: center; border: 1px solid var(--bordo); }
+.stat-card .num { font-size: 2rem; font-weight: 800; color: var(--blu); line-height: 1; }
+.stat-card .label { font-size: 0.75rem; color: var(--grigio); margin-top: 4px; }
+.stat-card.verde .num { color: var(--verde); }
+.stat-card.oro .num { color: var(--oro); }
+
+/* ── TABELLA ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 1000px; }
+thead tr { background: var(--blu); color: white; }
+thead th { padding: 10px 12px; text-align: left; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+tbody tr.tr-main { border-bottom: 1px solid var(--bordo); cursor: pointer; transition: background 0.15s; }
+tbody tr.tr-main:hover { background: var(--blu-l); }
+tbody tr.tr-main:nth-child(4n+1), tbody tr.tr-main:nth-child(4n+2) { background: var(--gri-l); }
+tbody tr.tr-main:nth-child(4n+1):hover, tbody tr.tr-main:nth-child(4n+2):hover { background: var(--blu-l); }
+tbody td { padding: 8px 12px; vertical-align: top; }
+
+/* Detail row */
+.tr-detail td { padding: 0; background: #f8fbff; border-bottom: 2px solid var(--blu-m); }
+.detail-inner { padding: 16px 20px; }
+.detail-header { font-size: 0.78rem; font-weight: 700; color: var(--blu-m); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.person-cards { display: flex; flex-wrap: wrap; gap: 12px; }
+.person-card { background: white; border: 1px solid var(--bordo); border-radius: 8px; padding: 14px; min-width: 260px; max-width: 360px; flex: 1; }
+.pc-head { font-weight: 700; color: var(--blu); font-size: 0.88rem; margin-bottom: 8px; display: flex; align-items: baseline; gap: 6px; }
+.pc-ruolo { font-size: 0.75rem; color: var(--grigio); font-weight: 400; }
+.pc-row { font-size: 0.8rem; margin-bottom: 5px; line-height: 1.4; }
+.pc-lbl { font-weight: 600; color: var(--grigio); }
+.pc-email { font-size: 0.75rem; color: var(--grigio); margin-top: 2px; }
+
+.td-nome { font-weight: 700; color: var(--blu); }
+.td-nome-inner { display: flex; align-items: center; gap: 6px; }
+.toggle-icon { font-size: 0.65rem; color: var(--blu-m); flex-shrink: 0; transition: transform 0.2s; display: inline-block; }
+.toggle-icon.open { transform: rotate(90deg); }
+.persone-badge { background: var(--blu); color: white; border-radius: 10px; padding: 1px 7px; font-size: 0.68rem; font-weight: 700; white-space: nowrap; }
+.persone-badge.uno { background: var(--bordo); color: var(--grigio); }
+
+.td-tag { display: inline-block; background: var(--blu-l); color: var(--blu); border-radius: 12px; padding: 1px 8px; font-size: 0.72rem; font-weight: 600; margin: 1px; }
+.td-tag.verde { background: var(--vrd-l); color: var(--verde); }
+.td-super { font-style: italic; color: var(--verde); font-weight: 600; font-size: 0.8rem; }
+.td-trunc { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scala-dot { display: inline-flex; gap: 3px; }
+.scala-dot span { width: 8px; height: 8px; border-radius: 50%; background: var(--bordo); }
+.scala-dot span.on { background: var(--verde); }
+.row-num { color: var(--grigio); font-weight: 700; text-align: center; }
+.media-val { font-size: 0.72rem; color: var(--grigio); margin-left: 3px; }
+
+/* ── AZIONI ── */
+.azioni { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-verde { background: var(--verde); color: white; }
+.btn-verde:hover { background: #236140; }
+.btn-blu { background: var(--blu); color: white; }
+.btn-blu:hover { background: var(--blu-m); }
+.btn-outline { background: transparent; color: var(--grigio); border: 1.5px solid var(--bordo); }
+.btn-outline:hover { border-color: var(--blu-m); color: var(--blu); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── NOTA ── */
+.nota { background: var(--oro-l); border-left: 3px solid var(--oro); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.83rem; color: #7a5a10; margin-bottom: 16px; line-height: 1.5; }
+.nota strong { color: #5a3e00; }
+
+/* ── VUOTO ── */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--grigio); }
+.empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+.empty-state p { font-size: 0.88rem; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--verde); color: white; border-radius: 8px; padding: 12px 20px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.errore { background: var(--rosso); }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .header { padding: 16px 18px; }
+  .header .status-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="badge"><span>A+</span></div>
+  <div>
+    <h1>Ecosistema A+ · Aggregatore Dati</h1>
+    <p>Importa i file JSON per azienda — più persone per la stessa azienda vengono fuse automaticamente</p>
+  </div>
+  <div class="status-badge" id="header-count">0 aziende caricate</div>
+</header>
+
+<div class="container">
+
+  <!-- ── IMPORTAZIONE ── -->
+  <div class="card">
+    <div class="card-header">
+      <h2>📥 Importa i file JSON</h2>
+    </div>
+    <div class="card-body">
+      <div class="nota">
+        Ogni persona dell'ecosistema invia il proprio file <strong>CartaIdentita_[Azienda]_[Referente]_2026.json</strong>.
+        Se più persone della <strong>stessa azienda</strong> inviano il loro file, vengono raggruppate automaticamente:
+        competenze e aspettative vengono fuse, le risposte individuali restano consultabili cliccando sulla riga.
+      </div>
+
+      <div class="dropzone" id="dropzone"
+           ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="onDrop(event)"
+           onclick="document.getElementById('file-input').click()">
+        <div class="icon">📂</div>
+        <h3>Trascina i file JSON qui</h3>
+        <p>oppure clicca per scegliere dal computer</p>
+        <button class="btn-upload" onclick="event.stopPropagation(); document.getElementById('file-input').click()">
+          Scegli file
+        </button>
+        <input type="file" id="file-input" accept=".json" multiple onchange="onFileSelect(event)">
+      </div>
+
+      <div class="file-list" id="file-list"></div>
+    </div>
+  </div>
+
+  <!-- ── STATISTICHE ── -->
+  <div class="card" id="stats-card" style="display:none">
+    <div class="card-header">
+      <h2>📊 Riepilogo</h2>
+      <span class="badge-count" id="count-badge">0</span>
+    </div>
+    <div class="card-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="num" id="stat-aziende">0</div>
+          <div class="label">Aziende</div>
+        </div>
+        <div class="stat-card verde">
+          <div class="num" id="stat-persone">0</div>
+          <div class="label">Rispondenti totali</div>
+        </div>
+        <div class="stat-card">
+          <div class="num" id="stat-settori">0</div>
+          <div class="label">Settori coperti</div>
+        </div>
+        <div class="stat-card oro">
+          <div class="num" id="stat-media">—</div>
+          <div class="label">Media conoscenza eco.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TABELLA DATI ── -->
+  <div class="card" id="table-card" style="display:none">
+    <div class="card-header">
+      <h2>🗂 Profili aziende</h2>
+      <span style="font-size:0.78rem;color:var(--grigio);margin-left:6px">Clicca su una riga per vedere le risposte individuali</span>
+    </div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table id="main-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Azienda</th>
+              <th>Referenti</th>
+              <th>Dimensione</th>
+              <th>Servizi principali</th>
+              <th>Settori</th>
+              <th>Competenze (fuse)</th>
+              <th>Superpotere</th>
+              <th>Aspettative (fuse)</th>
+              <th>Contributo eco.</th>
+              <th>Conoscenza</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AZIONI EXPORT ── -->
+  <div class="card" id="export-card" style="display:none">
+    <div class="card-header">
+      <h2>⬇ Esporta</h2>
+    </div>
+    <div class="card-body">
+      <div class="nota">
+        Il CSV ha le colonne <strong>nell'ordine esatto</strong> del foglio <strong>«Raccolta Dati»</strong> di
+        <em>Template_Analisi_EcosistemaA+.xlsx</em> (colonne B–W, riga 4).
+        Per importare: apri il CSV in Excel → seleziona tutto (Ctrl+A) → copia → vai nel template → clicca sulla
+        cella <strong>B5</strong> → incolla. Ogni riga = una azienda, con dati fusi da tutti i rispondenti.
+      </div>
+      <div class="azioni">
+        <button class="btn btn-verde" onclick="esportaCSV()">
+          📊 Esporta CSV per Excel
+        </button>
+        <button class="btn btn-blu" onclick="esportaJSON()">
+          📦 Esporta JSON aggregato
+        </button>
+        <button class="btn btn-outline" onclick="svuota()">
+          🗑 Svuota tutto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATO VUOTO -->
+  <div class="empty-state" id="empty-state">
+    <div class="icon">📋</div>
+    <p>Nessun dato ancora caricato.<br>Trascina i file JSON ricevuti via email nel riquadro sopra.</p>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ──────────────────────────────────────────────
+// STATO
+// loadedFiles: [{name, dati}] — tutti i JSON caricati
+// companies: { key: { azienda, persone[], merged_fields } }
+// ──────────────────────────────────────────────
+let loadedFiles = [];
+let companies   = {};  // key = azienda normalizzata
+
+// ── NORMALIZZA NOME AZIENDA ──
+function normKey(s) {
+  return String(s || '').trim().toLowerCase().replace(/\s+/g,' ');
+}
+
+// ── AGGIUNGE O FONDE UNA PERSONA NELL'AZIENDA ──
+function upsertPersona(dati) {
+  const key = normKey(dati.azienda);
+  if (!key) return false;
+
+  if (!companies[key]) {
+    // Prima persona di questa azienda
+    companies[key] = {
+      azienda:        dati.azienda,
+      descrizione:    dati.descrizione || '',
+      servizi:        [...(dati.servizi || [])],
+      settori:        [...(dati.settori || [])],
+      tipo_clienti:   dati.tipo_clienti || '',
+      anno_fondazione:dati.anno_fondazione || '',
+      dimensione:     dati.dimensione || '',
+      sito:           dati.sito || '',
+      // Campi aggregati (array)
+      persone:        [],
+      competenze:     [],
+      aspettative:    [],
+      superpotere:    [],
+      impatti:        [],
+      strumenti:      [],
+      contributo:     [],
+      sogno:          [],
+      progetto:       [],
+      scale_innovazione: [],
+      scale_conoscenza:  [],
+    };
+  }
+
+  const c = companies[key];
+  c.persone.push(dati);
+
+  // Aggiunge valori unici agli array aggregati
+  const addU = (arr, items) =>
+    (items || []).forEach(v => { if(v && !arr.includes(v)) arr.push(v); });
+
+  addU(c.competenze, dati.competenze);
+  addU(c.aspettative, dati.aspettative);
+  addU(c.impatti, dati.impatti);
+
+  const addStr = (arr, val) => { if(val && !arr.includes(val)) arr.push(val); };
+  addStr(c.superpotere,  dati.superpotere);
+  addStr(c.strumenti,    dati.strumenti);
+  addStr(c.progetto,     dati.progetto);
+  addStr(c.contributo,   dati.contributo);
+  addStr(c.sogno,        dati.sogno);
+
+  if (dati.scala_innovazione != null) c.scale_innovazione.push(Number(dati.scala_innovazione));
+  if (dati.scala_conoscenza  != null) c.scale_conoscenza.push(Number(dati.scala_conoscenza));
+
+  // Aggiorna campi "comuni" se vuoti
+  if (!c.descrizione && dati.descrizione) c.descrizione = dati.descrizione;
+  if (!c.dimensione  && dati.dimensione)  c.dimensione  = dati.dimensione;
+  if (!c.sito        && dati.sito)        c.sito        = dati.sito;
+  addU(c.settori, dati.settori);
+  addU(c.servizi, dati.servizi);
+
+  return true;
+}
+
+// ── RICOSTRUISCE companies DA loadedFiles ──
+function ricostruisci() {
+  companies = {};
+  loadedFiles.forEach(f => upsertPersona(f.dati));
+}
+
+function getCompaniesArray() {
+  return Object.values(companies);
+}
+
+// ── DRAG & DROP ──
+function dragOver(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.add('drag-over');
+}
+function dragLeave(e) {
+  document.getElementById('dropzone').classList.remove('drag-over');
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag-over');
+  processaFiles([...e.dataTransfer.files]);
+}
+function onFileSelect(e) {
+  processaFiles([...e.target.files]);
+  e.target.value = '';
+}
+
+// ── PROCESSA FILE ──
+function processaFiles(files) {
+  const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+  if (!jsonFiles.length) { mostraToast('Nessun file .json trovato', true); return; }
+
+  let caricati = 0;
+  jsonFiles.forEach(file => {
+    if (loadedFiles.find(f => f.name === file.name)) {
+      mostraToast(`"${file.name}" già caricato`, true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const dati = JSON.parse(ev.target.result);
+        if (!dati.azienda) throw new Error('Campo "azienda" mancante');
+        loadedFiles.push({ name: file.name, dati });
+        upsertPersona(dati);
+        caricati++;
+        aggiungaPill(file.name, dati.azienda, false);
+        aggiorna();
+        if (caricati === jsonFiles.filter(f => !loadedFiles.find(lf => lf.name === f.name && lf !== loadedFiles[loadedFiles.length-1])).length)
+          mostraToast(`${caricati} file caricati`);
+      } catch(err) {
+        aggiungaPill(file.name, '', true);
+        mostraToast(`Errore in ${file.name}: ${err.message}`, true);
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+// ── PILL ──
+function pillId(nome) { return 'pill-' + nome.replace(/[^a-zA-Z0-9]/g,'_'); }
+
+function aggiungaPill(nome, azienda, errore) {
+  const list = document.getElementById('file-list');
+  const pill = document.createElement('div');
+  pill.className = 'file-pill' + (errore ? ' errore' : '');
+  pill.id = pillId(nome);
+  const label = errore ? nome : (nome.length > 32 ? nome.slice(0,29)+'…' : nome);
+  pill.innerHTML = `${errore ? '⚠' : '✓'} ${esc(label)} <span class="rimuovi" onclick="rimuovi('${esc(nome)}')">×</span>`;
+  list.appendChild(pill);
+}
+
+function rimuovi(nome) {
+  loadedFiles = loadedFiles.filter(f => f.name !== nome);
+  ricostruisci();
+  const pill = document.getElementById(pillId(nome));
+  if (pill) pill.remove();
+  aggiorna();
+}
+
+// ── AGGIORNA UI ──
+function aggiorna() {
+  const listaAziende = getCompaniesArray();
+  const nAziende = listaAziende.length;
+  const nPersone = loadedFiles.length;
+  const hasData = nAziende > 0;
+
+  document.getElementById('empty-state').style.display  = hasData ? 'none'  : 'block';
+  document.getElementById('stats-card').style.display   = hasData ? 'block' : 'none';
+  document.getElementById('table-card').style.display   = hasData ? 'block' : 'none';
+  document.getElementById('export-card').style.display  = hasData ? 'block' : 'none';
+
+  document.getElementById('header-count').textContent =
+    `${nAziende} aziend${nAziende===1?'a':'e'} · ${nPersone} risponden${nPersone===1?'te':'ti'}`;
+  document.getElementById('count-badge').textContent = nAziende;
+  document.getElementById('stat-aziende').textContent = nAziende;
+  document.getElementById('stat-persone').textContent = nPersone;
+
+  // Settori unici
+  const settoriSet = new Set(listaAziende.flatMap(a => a.settori || []));
+  document.getElementById('stat-settori').textContent = settoriSet.size;
+
+  // Media conoscenza (media delle medie per azienda)
+  const medie = listaAziende
+    .map(a => a.scale_conoscenza.length
+      ? a.scale_conoscenza.reduce((s,v)=>s+v,0)/a.scale_conoscenza.length : null)
+    .filter(v => v !== null);
+  document.getElementById('stat-media').textContent =
+    medie.length ? (medie.reduce((a,b)=>a+b,0)/medie.length).toFixed(1) : '—';
+
+  renderTabella();
+}
+
+// ── TABELLA ──
+function scalaHtml(val, max=5) {
+  let html = '<div class="scala-dot">';
+  for (let i=1; i<=max; i++) html += `<span class="${i<=Math.round(val)?'on':''}"></span>`;
+  return html + '</div>';
+}
+function tags(arr, verde=false) {
+  if (!arr?.length) return '<span style="color:#9ca3af">—</span>';
+  return arr.map(t => `<span class="td-tag${verde?' verde':''}">${esc(t)}</span>`).join('');
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function trunc(s, n=55) {
+  s = String(s||'');
+  return s.length > n ? s.slice(0,n)+'…' : s;
+}
+function media(arr) {
+  if (!arr || !arr.length) return null;
+  return (arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1);
+}
+
+function renderTabella() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  getCompaniesArray().forEach((c, i) => {
+    const n = c.persone.length;
+    const medC = media(c.scale_conoscenza);
+
+    const mainId   = 'tr-main-'  + i;
+    const detailId = 'tr-detail-' + i;
+    const iconId   = 'icon-'     + i;
+
+    // ── Riga principale ──
+    const tr = document.createElement('tr');
+    tr.id = mainId;
+    tr.className = 'tr-main';
+    tr.onclick = () => toggleDetail(i);
+
+    const referentiHtml = c.persone.map(p => {
+      const nome = esc(p.referente || '—');
+      const ruolo = p.ruolo ? `<span style="color:#9ca3af;font-size:.72rem"> · ${esc(p.ruolo)}</span>` : '';
+      return `<div>${nome}${ruolo}</div>`;
+    }).join('');
+
+    const superHtml = c.superpotere.length
+      ? c.superpotere.map(s => `<div class="td-super">${esc(trunc(s, 45))}</div>`).join('')
+      : '<span style="color:#9ca3af">—</span>';
+
+    const aspHtml = c.aspettative.length
+      ? c.aspettative.slice(0,4).map(a => `<div style="font-size:.78rem;margin-bottom:2px">• ${esc(trunc(a,52))}</div>`).join('')
+        + (c.aspettative.length > 4 ? `<div style="font-size:.72rem;color:var(--grigio)">+${c.aspettative.length-4} altre…</div>` : '')
+      : '<span style="color:#9ca3af">—</span>';
+
+    const contributoHtml = c.contributo.length
+      ? `<div class="td-trunc" title="${esc(c.contributo[0])}">${esc(trunc(c.contributo[0]))}</div>`
+      : '<span style="color:#9ca3af">—</span>';
+
+    tr.innerHTML = `
+      <td class="row-num">${i+1}</td>
+      <td class="td-nome">
+        <div class="td-nome-inner">
+          <span class="toggle-icon" id="${esc(iconId)}">▶</span>
+          ${esc(c.azienda)}
+          <span class="persone-badge${n===1?' uno':''}">${n === 1 ? '1 persona' : n + ' persone'}</span>
+        </div>
+      </td>
+      <td>${referentiHtml}</td>
+      <td style="white-space:nowrap">${esc(c.dimensione||'—')}</td>
+      <td>${tags(c.servizi)}</td>
+      <td>${tags(c.settori)}</td>
+      <td>${tags(c.competenze, true)}</td>
+      <td>${superHtml}</td>
+      <td>${aspHtml}</td>
+      <td>${contributoHtml}</td>
+      <td>${medC ? scalaHtml(parseFloat(medC)) + `<span class="media-val">${medC}</span>` : '—'}</td>
+    `;
+    tbody.appendChild(tr);
+
+    // ── Riga dettaglio (nascosta) ──
+    const trDetail = document.createElement('tr');
+    trDetail.id = detailId;
+    trDetail.className = 'tr-detail';
+    trDetail.style.display = 'none';
+    trDetail.innerHTML = `
+      <td colspan="11">
+        <div class="detail-inner">
+          <div class="detail-header">Risposte individuali — ${esc(c.azienda)}</div>
+          <div class="person-cards">${c.persone.map(p => renderPersonCard(p)).join('')}</div>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(trDetail);
+  });
+}
+
+function toggleDetail(i) {
+  const trDetail = document.getElementById('tr-detail-' + i);
+  const icon     = document.getElementById('icon-' + i);
+  if (!trDetail) return;
+  const shown = trDetail.style.display !== 'none';
+  trDetail.style.display = shown ? 'none' : 'table-row';
+  if (icon) icon.classList.toggle('open', !shown);
+}
+
+function renderPersonCard(p) {
+  const comp = (p.competenze || []).map(c => esc(c)).join(', ') || '—';
+  const asp  = (p.aspettative || []).map((a,i) => `${i+1}. ${esc(a)}`).join('<br>') || '—';
+  const medc = p.scala_conoscenza ? `${p.scala_conoscenza}/5` : '—';
+  const medi = p.scala_innovazione ? `${p.scala_innovazione}/5` : '—';
+  return `
+    <div class="person-card">
+      <div class="pc-head">
+        ${esc(p.referente || '—')}
+        <span class="pc-ruolo">${esc(p.ruolo || '')}</span>
+      </div>
+      ${p.email ? `<div class="pc-email">${esc(p.email)}</div>` : ''}
+      <div style="height:8px"></div>
+      <div class="pc-row"><span class="pc-lbl">Competenze: </span>${comp}</div>
+      <div class="pc-row"><span class="pc-lbl">Superpotere: </span><em style="color:var(--verde)">${esc(p.superpotere || '—')}</em></div>
+      <div class="pc-row"><span class="pc-lbl">Aspettative:</span><br>${asp}</div>
+      ${p.contributo ? `<div class="pc-row"><span class="pc-lbl">Contributo: </span>${esc(trunc(p.contributo, 80))}</div>` : ''}
+      ${p.sogno ? `<div class="pc-row"><span class="pc-lbl">Sogno: </span><em>${esc(trunc(p.sogno, 80))}</em></div>` : ''}
+      <div class="pc-row" style="margin-top:6px;color:var(--grigio);font-size:.75rem">
+        Conoscenza eco.: ${medc} · Innovazione: ${medi}
+      </div>
+    </div>
+  `;
+}
+
+// ── EXPORT CSV — colonne allineate al foglio "Raccolta Dati" del Template Excel ──
+// Ordine e intestazioni corrispondono esattamente alle colonne B-W del template:
+// B:#  C:Azienda  D:Referente  E:Dimensione  F:Descrizione(2-3 frasi)
+// G:Servizio1  H:Servizio2  I:Servizio3  J:Settori  K-M:Competenze
+// N:Superpotere  O:Strumenti  P:Aspettativa1(priorità)  Q:Asp2  R:Asp3
+// S:Contributo  T:CollaborazioneSognata  U:Conoscenza(1-5)  V:Impatti  W:Note
+function esportaCSV() {
+  const lista = getCompaniesArray();
+  if (!lista.length) return;
+
+  // Colonne nell'ordine ESATTO del template, con intestazioni IDENTICHE
+  const COLS = [
+    ['#',                              (c, i) => i + 1],
+    ['Azienda',                        (c)    => c.azienda],
+    ['Referente',                      (c)    => c.persone.map(p => [p.referente, p.ruolo].filter(Boolean).join(' · ')).join(' | ')],
+    ['Dimensione',                     (c)    => c.dimensione],
+    ['Descrizione azienda (2-3 frasi)',(c)    => c.descrizione],
+    ['Servizio 1',                     (c)    => c.servizi?.[0]],
+    ['Servizio 2',                     (c)    => c.servizi?.[1]],
+    ['Servizio 3',                     (c)    => c.servizi?.[2]],
+    ['Settori di mercato',             (c)    => (c.settori||[]).join(' | ')],
+    ['Competenza 1',                   (c)    => c.competenze?.[0]],
+    ['Competenza 2',                   (c)    => c.competenze?.[1]],
+    ['Competenza 3',                   (c)    => c.competenze?.[2]],
+    ['Superpotere',                    (c)    => c.superpotere.join(' / ')],
+    ['Strumenti / Metodologie',        (c)    => c.strumenti.join(' / ')],
+    ['Aspettativa 1 (priorità)',       (c)    => c.aspettative?.[0]],
+    ['Aspettativa 2',                  (c)    => c.aspettative?.[1]],
+    ['Aspettativa 3',                  (c)    => c.aspettative?.[2]],
+    ["Contributo all'ecosistema",      (c)    => c.contributo.join(' / ')],
+    ['Collaborazione sognata',         (c)    => c.sogno.join(' / ')],
+    ['Conoscenza eco. (1-5)',          (c)    => media(c.scale_conoscenza)],
+    ['Impatti dichiarati',             (c)    => (c.impatti||[]).join(' | ')],
+    ['Note',                           (c)    => c.persone.map(p=>p.note||'').filter(Boolean).join(' | ')],
+  ];
+
+  const csvEsc = val => {
+    const s = String(val ?? '');
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? `"${s.replace(/"/g,'""')}"` : s;
+  };
+
+  const header = COLS.map(([h]) => csvEsc(h)).join(',');
+  const rows   = lista.map((c, i) => COLS.map(([, fn]) => csvEsc(fn(c, i))).join(','));
+
+  const csv = '﻿' + [header, ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  scarica(blob, `EcosistemaA+_RaccoltaDati_${today()}.csv`);
+  mostraToast('CSV esportato — colonne allineate al template Excel');
+}
+
+// ── EXPORT JSON AGGREGATO ──
+function esportaJSON() {
+  const lista = getCompaniesArray();
+  if (!lista.length) return;
+  const payload = {
+    ecosistema_a_plus: true,
+    fase: 1,
+    export_timestamp: new Date().toISOString(),
+    totale_aziende: lista.length,
+    totale_rispondenti: loadedFiles.length,
+    aziende: lista,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  scarica(blob, `EcosistemaA+_Aggregato_${today()}.json`);
+  mostraToast('JSON aggregato esportato');
+}
+
+// ── SVUOTA ──
+function svuota() {
+  if (!confirm('Svuotare tutti i dati caricati?')) return;
+  loadedFiles = []; companies = {};
+  document.getElementById('file-list').innerHTML = '';
+  aggiorna();
+}
+
+// ── UTILS ──
+function scarica(blob, nome) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nome;
+  a.style.cssText = 'position:fixed;top:-200px;left:-200px;opacity:0';
+  document.body.appendChild(a);
+  setTimeout(() => {
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+  }, 100);
+}
+function today() {
+  return new Date().toISOString().slice(0,10).replace(/-/g,'');
+}
+function mostraToast(msg, errore=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (errore ? ' errore' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// Init
+aggiorna();
+</script>
+</body>
+</html>

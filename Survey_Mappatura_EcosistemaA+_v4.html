@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<title>Ecosistema A+ · Mappatura Online</title>
+<style>
+:root{
+  --blu:#1a3a5c;--blu-m:#2c5f8a;--blu-ch:#e8f0f8;
+  --verde:#2e7d52;--verde-ch:#e6f4ec;
+  --arancio:#c85c20;--grigio:#6b7280;--grigio-ch:#f4f6f9;
+  --bordo:#d1d9e4;--testo:#1f2937;
+  --r:10px;--ombra:0 2px 12px rgba(26,58,92,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--grigio-ch);color:var(--testo);line-height:1.6;min-height:100vh}
+
+/* ── DRIVE BANNER — visibile di default, nascosto da JS se non in Drive ── */
+#drive-banner{
+  background:#fff3cd;border-bottom:3px solid #f59e0b;
+  padding:14px 20px;text-align:center;font-size:.88rem;color:#78350f;
+}
+#drive-banner strong{display:block;font-size:1rem;margin-bottom:4px}
+#drive-banner code{background:rgba(0,0,0,.08);padding:2px 6px;border-radius:4px;font-size:.85rem}
+
+/* ── HEADER ── */
+.site-header{background:var(--blu);color:white;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.hdr-logo{height:42px;width:auto;border-radius:4px;background:white;padding:2px;flex-shrink:0}
+.hdr-logo-badge{width:42px;height:42px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-logo-badge span{font-size:18px;font-weight:900;color:var(--blu)}
+.site-header h1{font-size:1.15rem;font-weight:700;line-height:1.2}
+.site-header p{font-size:.78rem;opacity:.80;margin-top:2px}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--blu-m);padding:9px 16px;display:flex;align-items:center;gap:10px}
+.progress-label{color:white;font-size:.76rem;white-space:nowrap;min-width:78px}
+.progress-track{flex:1;height:5px;background:rgba(255,255,255,.25);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:white;border-radius:3px;transition:width .4s ease;width:0%}
+.progress-steps{display:flex;gap:5px}
+.step-dot{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);color:white;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;transition:all .3s}
+.step-dot.active{background:white;color:var(--blu)}
+.step-dot.done{background:var(--verde)}
+
+/* ── CONTAINER ── */
+.container{max-width:680px;margin:0 auto;padding:18px 14px 60px}
+
+/* ── AUTOSAVE ── */
+.autosave-bar{background:var(--blu-ch);border:1px solid var(--bordo);border-radius:6px;padding:7px 12px;font-size:.76rem;color:var(--blu-m);margin-bottom:12px;display:none;align-items:center;gap:8px}
+.autosave-bar button{margin-left:auto;background:none;border:none;color:var(--arancio);font-size:.76rem;cursor:pointer;font-weight:600;white-space:nowrap;padding:2px 6px}
+
+/* ── INTRO ── */
+.intro-card{background:white;border-radius:var(--r);box-shadow:var(--ombra);padding:18px 20px;margin-bottom:18px;border-left:4px solid var(--verde)}
+.intro-card h2{color:var(--blu);font-size:.98rem;margin-bottom:6px}
+.intro-card p,.intro-card li{color:var(--grigio);font-size:.85rem}
+.intro-card ul{margin:6px 0 0 16px}
+.intro-card li{margin-bottom:3px}
+
+/* ── SEZIONE ── */
+.sezione{background:white;border-radius:var(--r);box-shadow:var(--ombra);margin-bottom:18px;overflow:hidden;display:none}
+.sezione.attiva{display:block;animation:fadeIn .3s ease}
+.sezione-header{background:var(--blu);color:white;padding:13px 18px;display:flex;align-items:center;gap:12px}
+.sezione-numero{width:30px;height:30px;background:rgba(255,255,255,.20);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex-shrink:0}
+.sezione-header h2{font-size:.98rem;font-weight:700}
+.sezione-header p{font-size:.76rem;opacity:.80;margin-top:1px}
+.sezione-body{padding:18px 20px}
+
+/* ── FORM ── */
+.campo{margin-bottom:18px}
+.campo-label-row{display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px;margin-bottom:5px}
+.campo-label-row label{font-size:.86rem;font-weight:600;color:var(--blu);flex:1;min-width:0}
+.campo-label-row .obbligatorio{color:var(--arancio)}
+.campo-label-row .hint-sub{font-weight:400;color:var(--grigio);font-size:.78rem;display:block;margin-top:1px}
+
+/* HINT BUTTON & BOX */
+.hint-btn{flex-shrink:0;background:none;border:1.5px solid var(--verde);border-radius:12px;padding:2px 9px;font-size:.72rem;color:var(--verde);cursor:pointer;font-weight:700;white-space:nowrap;touch-action:manipulation;transition:all .2s}
+.hint-btn:hover,.hint-btn.aperto{background:var(--verde);color:white}
+.hint-box{background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 7px 7px 0;padding:10px 14px;font-size:.82rem;color:#78350f;margin-top:6px;margin-bottom:8px;display:none}
+.hint-box.visibile{display:block;animation:fadeIn .2s ease}
+.hint-box strong{color:#92400e}
+.hint-box ul{margin:4px 0 0 14px}
+.hint-box li{margin-bottom:3px}
+.hint-box .esempio{font-style:italic;background:rgba(0,0,0,.05);padding:4px 8px;border-radius:4px;margin-top:4px;display:block;font-size:.8rem}
+
+input[type=text],input[type=email],input[type=url],input[type=number],textarea,select{
+  width:100%;padding:12px 14px;border:1.5px solid var(--bordo);border-radius:7px;
+  font-size:16px;font-family:inherit;color:var(--testo);background:white;
+  transition:border-color .2s,box-shadow .2s;outline:none;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--blu-m);box-shadow:0 0 0 3px rgba(44,95,138,.12)}
+textarea{resize:vertical;min-height:78px}
+
+.campo-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.campo-row{grid-template-columns:1fr}}
+.campi-triplo{display:flex;flex-direction:column;gap:8px}
+.num-label{display:flex;align-items:center;gap:8px}
+.num{width:24px;height:24px;background:var(--blu-ch);color:var(--blu);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.num.verde{background:var(--verde-ch);color:var(--verde)}
+
+/* CHECK/RADIO */
+.check-group{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.check-item{display:flex;align-items:center;gap:8px;background:var(--grigio-ch);border:1.5px solid var(--bordo);border-radius:7px;padding:10px 13px;cursor:pointer;font-size:.85rem;transition:all .2s;user-select:none;min-height:44px;touch-action:manipulation}
+.check-item:hover{border-color:var(--blu-m);background:var(--blu-ch)}
+.check-item input{display:none}
+.check-item.selezionato{border-color:var(--blu-m);background:var(--blu-ch);color:var(--blu);font-weight:600}
+.check-icon{width:18px;height:18px;border:2px solid var(--bordo);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.check-item.selezionato .check-icon{background:var(--blu-m);border-color:var(--blu-m)}
+.check-item.selezionato .check-icon::after{content:'✓';color:white;font-size:11px;font-weight:900}
+
+/* SCALA */
+.scala-wrap{margin-top:7px}
+.scala-etichette{display:flex;justify-content:space-between;font-size:.71rem;color:var(--grigio);margin-bottom:5px}
+.scala-opzioni{display:flex;gap:5px}
+.scala-opzione{flex:1;text-align:center;background:var(--grigio-ch);border:1.5px solid var(--bordo);border-radius:8px;padding:11px 4px;cursor:pointer;font-size:.95rem;font-weight:700;color:var(--grigio);transition:all .2s;min-height:44px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.scala-opzione:hover{border-color:var(--blu-m);color:var(--blu)}
+.scala-opzione.selezionata{background:var(--blu);border-color:var(--blu);color:white}
+
+.char-counter{text-align:right;font-size:.7rem;color:var(--grigio);margin-top:3px}
+.divisore{border:none;border-top:1px solid var(--bordo);margin:18px 0}
+.nota{background:var(--verde-ch);border-left:3px solid var(--verde);border-radius:0 7px 7px 0;padding:9px 13px;font-size:.82rem;color:#1a4a2e;margin-bottom:14px}
+
+/* ── NAV ── */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding-top:16px;border-top:1px solid var(--bordo);gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:13px 18px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;min-height:48px;touch-action:manipulation;text-decoration:none;white-space:nowrap}
+.btn-primario{background:var(--blu);color:white}
+.btn-primario:hover,.btn-primario:active{background:var(--blu-m)}
+.btn-secondario{background:transparent;color:var(--grigio);border:1.5px solid var(--bordo)}
+.btn-secondario:hover{border-color:var(--blu-m);color:var(--blu)}
+.btn-verde{background:var(--verde);color:white}
+.btn-verde:hover,.btn-verde:active{background:#1e5c3a}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:460px){
+  .nav-row{flex-direction:column}
+  .nav-row .btn{width:100%}
+  .nav-row .btn-secondario{order:2}
+  .nav-row .btn-primario,.nav-row .btn-verde{order:1}
+}
+
+/* ── CARTA ── */
+#carta-wrap{display:none}
+
+/* 3-STEP AZIONI */
+.azioni-card{background:white;border-radius:var(--r);box-shadow:var(--ombra);padding:20px;margin-bottom:18px;border-top:4px solid var(--verde)}
+.azioni-titolo{font-size:1rem;font-weight:700;color:var(--blu);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.passo{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid var(--bordo)}
+.passo:last-child{border-bottom:none;padding-bottom:0}
+.passo-num{width:32px;height:32px;border-radius:50%;background:var(--grigio-ch);border:2px solid var(--bordo);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:var(--grigio);flex-shrink:0;transition:all .3s}
+.passo-num.fatto{background:var(--verde);border-color:var(--verde);color:white}
+.passo-corpo{flex:1;min-width:0}
+.passo-titolo{font-size:.88rem;font-weight:700;color:var(--testo);margin-bottom:2px}
+.passo-desc{font-size:.78rem;color:var(--grigio);margin-bottom:8px;line-height:1.4}
+.passo-avviso{font-size:.76rem;color:var(--arancio);font-weight:600;margin-top:6px;display:none}
+.passo-avviso.visibile{display:block}
+.btn-passo{width:100%;padding:12px;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;min-height:48px;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-json{background:#1a3a5c;color:white}
+.btn-json:hover{background:#0f2540}
+.btn-json.fatto{background:#166534;cursor:default}
+.btn-pdf{background:#2c5f8a;color:white}
+.btn-pdf:hover{background:#1a3a5c}
+.btn-pdf.fatto{background:#166534;cursor:default}
+.btn-email-finale{background:var(--verde);color:white}
+.btn-email-finale:hover{background:#1e5c3a}
+
+/* FALLBACK JSON */
+.json-fallback{display:none;margin-top:10px;background:var(--grigio-ch);border-radius:7px;padding:12px}
+.json-fallback p{font-size:.78rem;color:var(--grigio);margin-bottom:6px;font-weight:600}
+.json-fallback textarea{font-size:12px;min-height:100px;resize:vertical;font-family:monospace}
+
+/* CARTA PREVIEW */
+.carta-preview{background:white;border-radius:var(--r);box-shadow:var(--ombra);overflow:hidden;margin-bottom:18px}
+.carta-header{background:var(--blu);color:white;padding:18px 20px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.carta-logo-img{height:36px;width:auto;border-radius:4px;background:white;padding:2px;flex-shrink:0}
+.carta-header h2{font-size:1.2rem;font-weight:800}
+.carta-header .sub{font-size:.82rem;opacity:.75;margin-top:1px}
+.carta-eco{margin-left:auto;text-align:right;flex-shrink:0}
+.eco-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 11px;font-size:.73rem;font-weight:700;letter-spacing:.5px;display:inline-block}
+.carta-body{padding:18px 20px}
+.carta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:480px){.carta-grid{grid-template-columns:1fr}}
+.cb{background:var(--grigio-ch);border-radius:8px;padding:12px 14px}
+.cb.full{grid-column:1/-1}
+.cb h4{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--grigio);margin-bottom:7px}
+.cb p{font-size:.86rem;line-height:1.5}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px}
+.tag{background:var(--blu-ch);color:var(--blu);border-radius:20px;padding:2px 10px;font-size:.76rem;font-weight:600}
+.tag.v{background:var(--verde-ch);color:var(--verde)}
+.sp-box{background:var(--blu);color:white;border-radius:8px;padding:11px 14px;text-align:center;margin:12px 0}
+.sp-box .sp-l{font-size:.65rem;text-transform:uppercase;letter-spacing:1px;opacity:.7}
+.sp-box .sp-v{font-size:1.05rem;font-weight:800;margin-top:3px}
+.asp-lista{list-style:none}
+.asp-lista li{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--bordo);font-size:.84rem}
+.asp-lista li:last-child{border-bottom:none}
+.asp-n{width:20px;height:20px;flex-shrink:0;background:var(--verde);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:800;margin-top:1px}
+.carta-footer{background:var(--grigio-ch);padding:10px 20px;font-size:.73rem;color:var(--grigio);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;border-top:1px solid var(--bordo)}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(100px);background:#1a3a5c;color:white;padding:10px 18px;border-radius:24px;font-size:.83rem;font-weight:600;transition:transform .3s ease;z-index:9999;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* PRINT */
+@media print{
+  body{background:white}
+  #drive-banner,.site-header,.progress-wrap,.sezione,.intro-card,.azioni-card,
+  .autosave-bar,#toast{display:none!important}
+  #carta-wrap{display:block!important}
+  .carta-preview{box-shadow:none}
+  .btn,.nav-row,.json-fallback{display:none!important}
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STATO INVIO ── */
+.stato-ok{background:#d1fae5;border-left:3px solid var(--verde);border-radius:0 7px 7px 0;padding:10px 14px;color:#065f46;font-size:.83rem;line-height:1.5}
+.stato-err{background:#fee2e2;border-left:3px solid #dc2626;border-radius:0 7px 7px 0;padding:10px 14px;color:#7f1d1d;font-size:.83rem;line-height:1.5}
+
+/* ── BANNER CONFIGURAZIONE KEY ── */
+#config-banner{background:#fef3c7;border-bottom:3px solid #f59e0b;padding:12px 18px;font-size:.83rem;color:#78350f}
+#config-banner strong{display:block;font-size:.9rem;margin-bottom:4px}
+#config-banner code{background:rgba(0,0,0,.1);padding:2px 6px;border-radius:4px;font-size:.8rem;font-family:monospace}
+</style>
+</head>
+<body>
+
+<!-- ══ BANNER CONFIGURAZIONE — visibile solo se access key non è configurata ══ -->
+<div id="config-banner" style="display:none">
+  <strong>⚙️ Configurazione richiesta — Access Key Web3Forms mancante</strong>
+  Per attivare l'invio automatico: sostituisci <code>INSERISCI_QUI_IL_TUO_ACCESS_KEY</code> nel file HTML con la tua chiave da
+  <a href="https://web3forms.com" target="_blank" rel="noopener" style="color:#92400e;font-weight:700">web3forms.com</a>
+  (gratuito, registrazione con n.scapicchio@ewaycoop.it).
+</div>
+
+<!-- ══ DRIVE BANNER — visibile di default, JS lo nasconde se non in Drive ══ -->
+<div id="drive-banner">
+  <strong>⚠️ Stai visualizzando questa pagina da Google Drive — il questionario non è compilabile in questa modalità.</strong>
+  Apri il file in Chrome o Safari: clicca i tre puntini <code>⋮</code> in alto a destra → <strong>Apri con → Chrome</strong> (o Safari su iPhone/iPad)
+</div>
+
+<!-- ══ HEADER ══ -->
+<header class="site-header">
+  <img class="hdr-logo" src="data:image/jpeg;base64,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" alt="E-Way" onerror="this.style.display='none';document.getElementById('hdr-badge').style.display='flex'">
+  <div class="hdr-logo-badge" id="hdr-badge" style="display:none"><span>A+</span></div>
+  <div>
+    <h1>Ecosistema A+ · Mappatura</h1>
+    <p>Fase 1 — Carta d'Identità dell'Azienda · Maggio 2026</p>
+  </div>
+</header>
+
+<!-- ══ PROGRESS ══ -->
+<div class="progress-wrap">
+  <span class="progress-label" id="progress-text">Sezione 1 di 5</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-steps">
+    <div class="step-dot active" data-step="1">1</div>
+    <div class="step-dot" data-step="2">2</div>
+    <div class="step-dot" data-step="3">3</div>
+    <div class="step-dot" data-step="4">4</div>
+    <div class="step-dot" data-step="5">5</div>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="autosave-bar" id="autosave-bar">
+  <span id="autosave-testo">💾 Bozza salvata</span>
+  <button type="button" onclick="cancellaAutosave()">✕ Cancella bozza</button>
+</div>
+
+<!-- INTRO -->
+<div class="intro-card" id="intro-card">
+  <h2>Ciao! Questo questionario richiede circa 15–20 minuti.</h2>
+  <p>Stiamo costruendo la <strong>mappa dell'Ecosistema A+</strong>: ogni persona compila la propria scheda e ne riceve una <em>Carta d'Identità</em> aziendale da condividere con il network.</p>
+  <ul>
+    <li>Ogni campo ha un pulsante <strong>💡 Esempi</strong> con suggerimenti — toccalo se hai dubbi.</li>
+    <li>Al termine: clicca <strong>Invia la Carta d'Identità</strong> — i tuoi dati arrivano direttamente a Nicola. <strong>Nessuna email da scrivere, nessun allegato da cercare.</strong></li>
+    <li>Se siete più persone della stessa azienda, ognuno compila il proprio modulo — i dati vengono uniti automaticamente.</li>
+    <li>Scadenza: <strong>venerdì 17 maggio 2026 ore 18:00</strong></li>
+  </ul>
+</div>
+
+<!-- ══════════ SEZIONE 1 ══════════ -->
+<div class="sezione attiva" id="s1">
+  <div class="sezione-header">
+    <div class="sezione-numero">1</div>
+    <div><h2>Chi siete</h2><p>Informazioni di base sull'azienda e sul compilatore</p></div>
+  </div>
+  <div class="sezione-body">
+
+    <div class="campo-row">
+      <div class="campo">
+        <div class="campo-label-row"><label>Nome dell'azienda <span class="obbligatorio">*</span></label></div>
+        <input type="text" id="f1-azienda" placeholder="es. E-Way Soc. Coop." autocomplete="organization">
+      </div>
+      <div class="campo">
+        <div class="campo-label-row"><label>Sito web <span style="font-weight:400;color:var(--grigio);font-size:.8rem">(opzionale)</span></label></div>
+        <input type="url" id="f1-sito" placeholder="https://" autocomplete="url">
+      </div>
+    </div>
+
+    <div class="campo-row">
+      <div class="campo">
+        <div class="campo-label-row"><label>Il tuo nome e cognome <span class="obbligatorio">*</span></label></div>
+        <input type="text" id="f1-referente" placeholder="es. Mario Rossi" autocomplete="name">
+      </div>
+      <div class="campo">
+        <div class="campo-label-row"><label>Ruolo / Qualifica <span class="obbligatorio">*</span></label></div>
+        <input type="text" id="f1-ruolo" placeholder="es. Amministratore · CEO">
+      </div>
+    </div>
+
+    <div class="campo-row">
+      <div class="campo">
+        <div class="campo-label-row"><label>Email di contatto <span class="obbligatorio">*</span></label></div>
+        <input type="email" id="f1-email" placeholder="nome@azienda.it" autocomplete="email">
+      </div>
+      <div class="campo">
+        <div class="campo-label-row"><label>Anno di fondazione</label></div>
+        <input type="number" id="f1-anno" placeholder="es. 2010" min="1900" max="2026" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Dimensione dell'azienda <span class="obbligatorio">*</span></label></div>
+      <div class="check-group">
+        <label class="check-item"><input type="radio" name="dim" value="1-5"><span class="check-icon"></span>1–5 persone</label>
+        <label class="check-item"><input type="radio" name="dim" value="6-15"><span class="check-icon"></span>6–15 persone</label>
+        <label class="check-item"><input type="radio" name="dim" value="16-50"><span class="check-icon"></span>16–50 persone</label>
+        <label class="check-item"><input type="radio" name="dim" value="50+"><span class="check-icon"></span>Oltre 50</label>
+      </div>
+    </div>
+
+    <div class="nav-row"><span></span><button class="btn btn-primario" onclick="vaA(2)">Avanti →</button></div>
+  </div>
+</div>
+
+<!-- ══════════ SEZIONE 2 ══════════ -->
+<div class="sezione" id="s2">
+  <div class="sezione-header">
+    <div class="sezione-numero">2</div>
+    <div><h2>I vostri servizi</h2><p>Cosa fate e per chi</p></div>
+  </div>
+  <div class="sezione-body">
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>In 2–3 frasi, descrivete cosa fa la vostra azienda <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-desc')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-desc">
+        <strong>Struttura consigliata:</strong> Chi siamo · Cosa facciamo · Per chi · Dove
+        <ul>
+          <li><span class="esempio">"Siamo una cooperativa di consulenza HR che aiuta PMI manifatturiere del nord-est a strutturare processi di selezione e sviluppo del personale, con focus sulla sostenibilità del lavoro."</span></li>
+          <li><span class="esempio">"Gestiamo la logistica di ultimo miglio per e-commerce nella Regione Marche, con flotta propria di 40 veicoli a basse emissioni e focus sulla puntualità."</span></li>
+          <li><span class="esempio">"Studio di commercialisti specializzato in fiscalità d'impresa per cooperative e società benefit. Affianchiamo i clienti dalla costituzione alla rendicontazione annuale."</span></li>
+        </ul>
+      </div>
+      <textarea id="f2-descrizione" rows="3" maxlength="400" placeholder="La nostra azienda…" oninput="contaC(this,'cnt-desc')"></textarea>
+      <div class="char-counter"><span id="cnt-desc">0</span>/400</div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>I 3 servizi o prodotti principali <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-serv')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-serv">
+        <strong>Inserite in ordine di rilevanza economica o strategica.</strong>
+        <ul>
+          <li><span class="esempio">Servizio 1: "Selezione e recruiting" · Servizio 2: "Formazione manageriale" · Servizio 3: "Assessment organizzativo"</span></li>
+          <li><span class="esempio">Servizio 1: "Trasporto merci conto terzi" · Servizio 2: "Magazzinaggio e gestione scorte" · Servizio 3: "Last-mile delivery e-commerce"</span></li>
+        </ul>
+      </div>
+      <div class="campi-triplo">
+        <div class="num-label"><div class="num">1</div><input type="text" id="f2-s1" placeholder="Servizio / prodotto principale"></div>
+        <div class="num-label"><div class="num">2</div><input type="text" id="f2-s2" placeholder="Secondo servizio / prodotto"></div>
+        <div class="num-label"><div class="num">3</div><input type="text" id="f2-s3" placeholder="Terzo servizio / prodotto"></div>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Settori / mercati in cui operate prevalentemente <span class="obbligatorio">*</span></label></div>
+      <div class="check-group" id="f2-settori">
+        <label class="check-item"><input type="checkbox" value="Logistica & Trasporti"><span class="check-icon"></span>Logistica & Trasporti</label>
+        <label class="check-item"><input type="checkbox" value="Manifattura & Industria"><span class="check-icon"></span>Manifattura & Industria</label>
+        <label class="check-item"><input type="checkbox" value="Retail & GDO"><span class="check-icon"></span>Retail & GDO</label>
+        <label class="check-item"><input type="checkbox" value="Agroalimentare"><span class="check-icon"></span>Agroalimentare</label>
+        <label class="check-item"><input type="checkbox" value="Servizi professionali"><span class="check-icon"></span>Servizi professionali</label>
+        <label class="check-item"><input type="checkbox" value="PA & Terzo settore"><span class="check-icon"></span>PA & Terzo settore</label>
+        <label class="check-item"><input type="checkbox" value="Edilizia & Immobiliare"><span class="check-icon"></span>Edilizia & Immobiliare</label>
+        <label class="check-item"><input type="checkbox" value="Altro"><span class="check-icon"></span>Altro</label>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Tipologia di clienti prevalente</label></div>
+      <div class="check-group">
+        <label class="check-item"><input type="radio" name="clienti" value="Principalmente B2B"><span class="check-icon"></span>Principalmente B2B</label>
+        <label class="check-item"><input type="radio" name="clienti" value="Principalmente B2C"><span class="check-icon"></span>Principalmente B2C</label>
+        <label class="check-item"><input type="radio" name="clienti" value="B2B e B2C"><span class="check-icon"></span>Mix B2B e B2C</label>
+        <label class="check-item"><input type="radio" name="clienti" value="PA / Non profit"><span class="check-icon"></span>PA / Non profit</label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondario" onclick="vaA(1)">← Indietro</button>
+      <button class="btn btn-primario" onclick="vaA(3)">Avanti →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SEZIONE 3 ══════════ -->
+<div class="sezione" id="s3">
+  <div class="sezione-header">
+    <div class="sezione-numero">3</div>
+    <div><h2>Le vostre competenze distintive</h2><p>Cosa sapete fare meglio degli altri</p></div>
+  </div>
+  <div class="sezione-body">
+
+    <div class="nota">💡 Pensate a ciò che i clienti vengono a cercare specificatamente da voi e che i concorrenti faticano a replicare.</div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>3 competenze chiave che vi distinguono <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-comp')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-comp">
+        <strong>Potete indicare competenze tecniche, metodologiche, relazionali o di settore.</strong>
+        <ul>
+          <li><span class="esempio">"Pianificazione strategica multilivello" · "Gestione di reti d'impresa" · "Formazione esperienziale per team operativi"</span></li>
+          <li><span class="esempio">"Analisi finanziaria per cooperative" · "Rendicontazione ESG standard SABI" · "M&A per PMI familiari"</span></li>
+          <li><span class="esempio">"Ottimizzazione percorsi di consegna last-mile" · "Gestione magazzini freezer" · "Integrazione sistemi WMS"</span></li>
+        </ul>
+      </div>
+      <div class="campi-triplo">
+        <div class="num-label"><div class="num">1</div><input type="text" id="f3-c1" placeholder="es. Pianificazione strategica multilivello"></div>
+        <div class="num-label"><div class="num">2</div><input type="text" id="f3-c2" placeholder="es. Reporting di sostenibilità standard SABI"></div>
+        <div class="num-label"><div class="num">3</div><input type="text" id="f3-c3" placeholder="es. Formazione manageriale esperienziale"></div>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Il vostro "superpotere" — in una parola o frase breve <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-sp')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-sp">
+        <strong>Quella cosa che vi viene naturale e che gli altri faticano a replicare.</strong>
+        <ul>
+          <li><span class="esempio">"Trasformare la complessità in chiarezza operativa"</span></li>
+          <li><span class="esempio">"Costruire fiducia nei team in situazioni di crisi"</span></li>
+          <li><span class="esempio">"Trovare sempre la soluzione logistica anche nell'impossibile"</span></li>
+          <li><span class="esempio">"Far emergere il potenziale nascosto nelle organizzazioni"</span></li>
+        </ul>
+      </div>
+      <input type="text" id="f3-superpotere" placeholder="es. Trasformare la complessità in chiarezza" maxlength="80">
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Strumenti, metodologie o tecnologie che caratterizzano il vostro lavoro</label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-strum')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-strum">
+        <ul>
+          <li><span class="esempio">Metodologie: Design Thinking, Agile Scrum, Lean Manufacturing, SABI, Business Model Canvas</span></li>
+          <li><span class="esempio">Tecnologie: BI e data analytics, WMS, CRM proprietario, piattaforme e-learning</span></li>
+          <li><span class="esempio">Certificazioni: ISO 9001, SA8000, B Corp, Società Benefit</span></li>
+        </ul>
+      </div>
+      <textarea id="f3-strumenti" rows="2" maxlength="300" placeholder="es. Utilizziamo Design Thinking per la progettazione dei servizi e strumenti BI per l'analisi…" oninput="contaC(this,'cnt-strum')"></textarea>
+      <div class="char-counter"><span id="cnt-strum">0</span>/300</div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Quanto è innovativo il vostro approccio rispetto al mercato? (1–5)</label></div>
+      <div class="scala-wrap">
+        <div class="scala-etichette"><span>Tradizionale / consolidato</span><span>Molto innovativo</span></div>
+        <div class="scala-opzioni" id="f3-innovazione">
+          <div class="scala-opzione" onclick="selScale('f3-innovazione',1)">1</div>
+          <div class="scala-opzione" onclick="selScale('f3-innovazione',2)">2</div>
+          <div class="scala-opzione" onclick="selScale('f3-innovazione',3)">3</div>
+          <div class="scala-opzione" onclick="selScale('f3-innovazione',4)">4</div>
+          <div class="scala-opzione" onclick="selScale('f3-innovazione',5)">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondario" onclick="vaA(2)">← Indietro</button>
+      <button class="btn btn-primario" onclick="vaA(4)">Avanti →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SEZIONE 4 ══════════ -->
+<div class="sezione" id="s4">
+  <div class="sezione-header">
+    <div class="sezione-numero">4</div>
+    <div><h2>Un'esperienza che vi rappresenta</h2><p>Un progetto o risultato di cui siete orgogliosi</p></div>
+  </div>
+  <div class="sezione-body">
+
+    <div class="nota">📌 Non servono dettagli riservati — anche una descrizione generale va benissimo. L'obiettivo è far capire <em>come lavorate</em> e <em>quali impatti generate</em>.</div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Descrivete un progetto, un'iniziativa o un risultato degli ultimi 2–3 anni <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-prog')">💡 Schema guidato</button>
+      </div>
+      <div class="hint-box" id="h-prog">
+        <strong>Usate questa struttura — non serve che sia perfetta:</strong>
+        <ul>
+          <li><strong>Contesto:</strong> che tipo di cliente/organizzazione, settore, dimensione</li>
+          <li><strong>Sfida:</strong> qual era il problema o l'obiettivo da raggiungere</li>
+          <li><strong>Approccio:</strong> cosa avete fatto di specifico, in che modo ci avete lavorato</li>
+          <li><strong>Risultato:</strong> cosa è cambiato concretamente (anche in termini qualitativi)</li>
+        </ul>
+        <span class="esempio">"Una cooperativa sociale con 80 soci stava perdendo coesione interna dopo una fusione. Abbiamo facilitato un percorso di 4 mesi con il CdA e i responsabili di area, usando Design Thinking per ridefinire i processi decisionali. Il risultato: nuovo regolamento approvato all'unanimità e 30% di riduzione dei conflitti interni nei 6 mesi successivi."</span>
+      </div>
+      <textarea id="f4-progetto" rows="7" maxlength="1800" placeholder="Contesto · Sfida · Approccio · Risultato" oninput="contaC(this,'cnt-prog')"></textarea>
+      <div class="char-counter"><span id="cnt-prog">0</span>/1800</div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Quali impatti ha generato?</label></div>
+      <div class="check-group" id="f4-impatti">
+        <label class="check-item"><input type="checkbox" value="Impatto economico"><span class="check-icon"></span>Economico</label>
+        <label class="check-item"><input type="checkbox" value="Impatto sulle persone"><span class="check-icon"></span>Sulle persone</label>
+        <label class="check-item"><input type="checkbox" value="Impatto ambientale"><span class="check-icon"></span>Ambientale</label>
+        <label class="check-item"><input type="checkbox" value="Impatto sulla comunità"><span class="check-icon"></span>Sulla comunità</label>
+        <label class="check-item"><input type="checkbox" value="Impatto organizzativo"><span class="check-icon"></span>Organizzativo</label>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Questo approccio è trasferibile a un'altra azienda dell'ecosistema?</label></div>
+      <div class="check-group">
+        <label class="check-item"><input type="radio" name="replicabile" value="Sì, certamente"><span class="check-icon"></span>Sì, certamente</label>
+        <label class="check-item"><input type="radio" name="replicabile" value="Forse, dipende dal contesto"><span class="check-icon"></span>Forse, dipende</label>
+        <label class="check-item"><input type="radio" name="replicabile" value="Non facilmente"><span class="check-icon"></span>Non facilmente</label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondario" onclick="vaA(3)">← Indietro</button>
+      <button class="btn btn-primario" onclick="vaA(5)">Avanti →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SEZIONE 5 ══════════ -->
+<div class="sezione" id="s5">
+  <div class="sezione-header">
+    <div class="sezione-numero">5</div>
+    <div><h2>Sull'Ecosistema A+</h2><p>Aspettative, contributi e visione condivisa</p></div>
+  </div>
+  <div class="sezione-body">
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Le 3 cose più importanti che vi aspettate dall'Ecosistema A+ <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-asp')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-asp">
+        <strong>Pensate in termini pratici: cosa cambierebbe concretamente nella vostra azienda?</strong>
+        <ul>
+          <li><span class="esempio">"Sviluppare partnership commerciali con aziende complementari alle nostre"</span></li>
+          <li><span class="esempio">"Accedere a bandi e finanziamenti a cui da soli non possiamo partecipare"</span></li>
+          <li><span class="esempio">"Condividere competenze su temi normativi (ESG, rendicontazione, appalti)"</span></li>
+          <li><span class="esempio">"Trovare subfornitori fidati già conosciuti e verificati dall'ecosistema"</span></li>
+          <li><span class="esempio">"Costruire un brand collettivo più forte di quello che possiamo fare da soli"</span></li>
+        </ul>
+      </div>
+      <div class="campi-triplo">
+        <div class="num-label"><div class="num verde">1</div><input type="text" id="f5-a1" placeholder="Aspettativa più importante…"></div>
+        <div class="num-label"><div class="num verde">2</div><input type="text" id="f5-a2" placeholder="Seconda aspettativa…"></div>
+        <div class="num-label"><div class="num verde">3</div><input type="text" id="f5-a3" placeholder="Terza aspettativa…"></div>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Cosa portate all'ecosistema che oggi non è ancora valorizzato abbastanza? <span class="obbligatorio">*</span></label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-contr')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-contr">
+        <strong>Pensate a competenze rare, reti di relazioni, risorse, metodi o strumenti che avete e altri non hanno.</strong>
+        <ul>
+          <li><span class="esempio">"Porto una rete consolidata di contatti nella grande distribuzione organizzata regionale"</span></li>
+          <li><span class="esempio">"Abbiamo una piattaforma digitale di gestione ordini già sviluppata che potrebbe essere condivisa"</span></li>
+          <li><span class="esempio">"Competenze rare in rendicontazione ESG e Società Benefit — posso supportare le altre aziende nel percorso"</span></li>
+          <li><span class="esempio">"Spazi fisici (magazzini / showroom) che potrebbero essere usati dall'ecosistema"</span></li>
+        </ul>
+      </div>
+      <textarea id="f5-contributo" rows="3" maxlength="500" placeholder="Potrei portare all'ecosistema…" oninput="contaC(this,'cnt-contr')"></textarea>
+      <div class="char-counter"><span id="cnt-contr">0</span>/500</div>
+    </div>
+
+    <hr class="divisore">
+
+    <div class="campo">
+      <div class="campo-label-row">
+        <label>Una collaborazione che sognereste di sviluppare nell'ecosistema</label>
+        <button class="hint-btn" type="button" onclick="toggleHint('h-sogno')">💡 Esempi</button>
+      </div>
+      <div class="hint-box" id="h-sogno">
+        <strong>Può essere vaga, un'idea, un desiderio — non c'è nessun impegno.</strong>
+        <ul>
+          <li><span class="esempio">"Creare con un'altra azienda un'offerta integrata trasporto + consulenza per clienti nel food"</span></li>
+          <li><span class="esempio">"Sviluppare un percorso formativo comune per i responsabili operativi di tutte le aziende"</span></li>
+          <li><span class="esempio">"Partecipare insieme a un bando europeo su mobilità sostenibile"</span></li>
+        </ul>
+      </div>
+      <textarea id="f5-sogno" rows="2" maxlength="400" placeholder="Mi piacerebbe collaborare con… per fare…" oninput="contaC(this,'cnt-sogno')"></textarea>
+      <div class="char-counter"><span id="cnt-sogno">0</span>/400</div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Quanto conoscete le altre aziende dell'ecosistema? (1–5)</label></div>
+      <div class="scala-wrap">
+        <div class="scala-etichette"><span>Non le conosco bene</span><span>Le conosco molto bene</span></div>
+        <div class="scala-opzioni" id="f5-conoscenza">
+          <div class="scala-opzione" onclick="selScale('f5-conoscenza',1)">1</div>
+          <div class="scala-opzione" onclick="selScale('f5-conoscenza',2)">2</div>
+          <div class="scala-opzione" onclick="selScale('f5-conoscenza',3)">3</div>
+          <div class="scala-opzione" onclick="selScale('f5-conoscenza',4)">4</div>
+          <div class="scala-opzione" onclick="selScale('f5-conoscenza',5)">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="campo">
+      <div class="campo-label-row"><label>Note libere — riflessioni, aspettative particolari, domande…</label></div>
+      <textarea id="f5-note" rows="2" maxlength="600" oninput="contaC(this,'cnt-note')"></textarea>
+      <div class="char-counter"><span id="cnt-note">0</span>/600</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondario" onclick="vaA(4)">← Indietro</button>
+      <button class="btn btn-verde" onclick="generaCarta()">✦ Genera la Carta d'Identità</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ OUTPUT ══════════ -->
+<div id="carta-wrap">
+
+  <!-- 3 PASSI -->
+  <div class="azioni-card">
+    <div class="azioni-titolo">✦ Carta d'Identità pronta — completa questi 3 passi per inviarla</div>
+
+    <div class="passo">
+      <div class="passo-num" id="num-1">1</div>
+      <div class="passo-corpo">
+        <div class="passo-titolo">Scarica i dati strutturati (JSON)</div>
+        <div class="passo-desc">File con tutte le tue risposte — necessario per l'aggregazione con le altre aziende.</div>
+        <button class="btn-passo btn-json" id="btn-json" onclick="scaricaJSON()">💾 Scarica JSON</button>
+        <div class="json-fallback" id="json-fallback">
+          <p>Il download non si è aperto automaticamente. Copia il testo qui sotto e salvalo come file .json:</p>
+          <textarea id="json-text" readonly onclick="this.select()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="passo-num" id="num-2">2</div>
+      <div class="passo-corpo">
+        <div class="passo-titolo">Salva la Carta d'Identità come PDF</div>
+        <div class="passo-desc">Clicca il pulsante → si apre la stampa → scegli <strong>"Salva come PDF"</strong> (o "Condividi → Salva su File" su iPhone).</div>
+        <button class="btn-passo btn-pdf" id="btn-pdf" onclick="stampaPDF()">🖨 Stampa / Salva PDF</button>
+      </div>
+    </div>
+
+    <div class="passo" style="padding-bottom:0;border-bottom:none">
+      <div class="passo-num" id="num-3">3</div>
+      <div class="passo-corpo">
+        <div class="passo-titolo">Invia la Carta d'Identità online</div>
+        <div class="passo-desc">Un click — i tuoi dati arrivano direttamente a Nicola. <strong>Non serve allegare nulla, non serve aprire l'email.</strong></div>
+        <button class="btn-passo btn-email-finale" id="btn-invia-online" onclick="inviaOnline()" style="margin-top:8px">📡 Invia la Carta d'Identità</button>
+        <div id="stato-invio" style="display:none;margin-top:10px"></div>
+        <details style="margin-top:14px">
+          <summary style="font-size:.76rem;color:var(--grigio);cursor:pointer;user-select:none">📧 Metodo alternativo: invia per email tradizionale</summary>
+          <div style="padding:8px 0 0 4px">
+            <div style="font-size:.76rem;color:var(--grigio);margin-bottom:8px">Solo se l'invio automatico non funziona — allega JSON + PDF prima di inviare.</div>
+            <div class="passo-avviso" id="avviso-passi">⚠️ Scarica prima JSON (passo 1) e PDF (passo 2) da allegare</div>
+            <button class="btn-passo" style="background:var(--grigio-ch);color:var(--testo);border:1.5px solid var(--bordo);font-size:.82rem;padding:10px;margin-top:6px" onclick="inviaEmail()">📧 Componi email con allegati</button>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bordo);display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-secondario" style="font-size:.82rem;padding:9px 14px;min-height:40px" onclick="tornaAlForm()">← Modifica risposte</button>
+    </div>
+  </div>
+
+  <!-- CARTA PREVIEW -->
+  <div class="carta-preview" id="carta-output">
+    <div class="carta-header">
+      <img class="carta-logo-img" src="data:image/jpeg;base64,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" alt="E-Way" onerror="this.style.display='none'">
+      <div>
+        <h2 id="c-nome">—</h2>
+        <p class="sub" id="c-referente">—</p>
+        <p class="sub" id="c-contatti" style="opacity:.6;font-size:.76rem;margin-top:1px">—</p>
+      </div>
+      <div class="carta-eco">
+        <div class="eco-badge">ECOSISTEMA A+</div>
+        <p style="font-size:.7rem;opacity:.65;margin-top:4px">Mappatura · Maggio 2026</p>
+      </div>
+    </div>
+    <div class="carta-body">
+      <div class="sp-box"><div class="sp-l">Il nostro superpotere</div><div class="sp-v" id="c-sp">—</div></div>
+      <div class="carta-grid">
+        <div class="cb full"><h4>Chi siamo</h4><p id="c-desc">—</p></div>
+        <div class="cb"><h4>Servizi principali</h4><div class="tag-list" id="c-serv"></div></div>
+        <div class="cb"><h4>Settori di riferimento</h4><div class="tag-list" id="c-sett"></div></div>
+        <div class="cb full"><h4>Competenze chiave</h4><div class="tag-list" id="c-comp"></div></div>
+        <div class="cb"><h4>Metodologie e strumenti</h4><p id="c-strum" style="font-size:.83rem">—</p></div>
+        <div class="cb"><h4>Impatti generati</h4><div class="tag-list" id="c-imp"></div></div>
+        <div class="cb full"><h4>Esperienza raccontata</h4><p id="c-prog" style="font-size:.82rem;line-height:1.6">—</p></div>
+        <div class="cb full"><h4>Aspettative dall'Ecosistema A+</h4><ul class="asp-lista" id="c-asp"></ul></div>
+        <div class="cb full"><h4>Cosa portiamo all'ecosistema</h4><p id="c-contr" style="font-size:.85rem">—</p></div>
+        <div class="cb full"><h4>La collaborazione che vorremmo sviluppare</h4><p id="c-sogno" style="font-size:.85rem;font-style:italic;color:var(--verde)">—</p></div>
+      </div>
+    </div>
+    <div class="carta-footer">
+      <span>Ecosistema A+ · Fase 1 Mappatura · Maggio 2026</span>
+      <span id="c-footer">—</span>
+    </div>
+  </div><!-- /carta-preview -->
+
+</div><!-- /carta-wrap -->
+</div><!-- /container -->
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIGURAZIONE WEB3FORMS
+// 1. Vai su https://web3forms.com
+// 2. Inserisci n.scapicchio@ewaycoop.it → ricevi l'access_key per email
+// 3. Sostituisci il valore qui sotto
+// ══════════════════════════════════════════════
+const W3F_KEY = '3e0d2de2-4222-4156-8a99-797ec94e1fe7';
+
+// ══ PASSO 3: INVIA ONLINE (Web3Forms) ══
+async function inviaOnline() {
+  const d = raccogliDati();
+  const btn = document.getElementById('btn-invia-online');
+  const stato = document.getElementById('stato-invio');
+
+  // Validazione minima
+  if (!d.azienda || !d.referente) {
+    toast('⚠️ Compila almeno il nome azienda e il tuo nome (Sezione 1)');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Invio in corso…';
+  stato.style.display = 'none';
+
+  const payload = {
+    access_key: W3F_KEY,
+    subject: "Carta d'Identità A+ — " + (d.azienda||'?') + ' — ' + (d.referente||'?'),
+    from_name: (d.referente||'Partecipante') + ' (' + (d.azienda||'Azienda') + ')',
+    replyto: d.email || '',
+    // ── Dati strutturati (ordinati come colonne template Excel) ──
+    '01_Azienda':          d.azienda,
+    '02_Referente':        d.referente,
+    '03_Ruolo':            d.ruolo,
+    '04_Email':            d.email,
+    '05_Sito':             d.sito,
+    '06_Anno_Fondazione':  d.anno_fondazione,
+    '07_Dimensione':       d.dimensione,
+    '08_Descrizione':      d.descrizione,
+    '09_Servizi':          (d.servizi||[]).join(' | '),
+    '10_Settori':          (d.settori||[]).join(', '),
+    '11_Tipo_Clienti':     d.tipo_clienti,
+    '12_Competenze':       (d.competenze||[]).join(' | '),
+    '13_Superpotere':      d.superpotere,
+    '14_Strumenti':        d.strumenti,
+    '15_Scala_Innovazione':d.scala_innovazione,
+    '16_Progetto':         d.progetto,
+    '17_Impatti':          (d.impatti||[]).join(', '),
+    '18_Replicabile':      d.replicabile,
+    '19_Aspettative':      (d.aspettative||[]).join(' | '),
+    '20_Contributo':       d.contributo,
+    '21_Sogno':            d.sogno,
+    '22_Scala_Conoscenza': d.scala_conoscenza,
+    '23_Note':             d.note,
+    // ── JSON completo per copia-incolla nell'Aggregatore ──
+    'JSON_per_Aggregatore': JSON.stringify(d, null, 2)
+  };
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      segnaFatto(3);
+      btn.textContent = '✅ Carta inviata con successo!';
+      stato.className = 'stato-ok';
+      stato.style.display = 'block';
+      stato.innerHTML = '✅ <strong>I tuoi dati sono arrivati a Nicola!</strong> Riceverai una conferma alla tua email. Non devi fare altro — grazie per aver compilato la Carta d\'Identità 🎉';
+      toast('✅ Carta d\'Identità inviata!');
+      try { localStorage.removeItem('ecoa_draft'); } catch(e) {}
+    } else {
+      throw new Error(result.message || 'Errore del servizio');
+    }
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = '📡 Riprova l\'invio';
+    stato.className = 'stato-err';
+    stato.style.display = 'block';
+    stato.innerHTML = '⚠️ <strong>Invio non riuscito.</strong> Controlla la connessione e riprova, oppure usa il metodo email alternativo qui sotto.';
+    toast('⚠️ Errore: ' + (err.message||'connessione assente'));
+  }
+}
+
+// ══ STATE ══
+let sezioneAttuale = 1;
+const scala = {};
+let jsonFatto = false, pdfFatto = false;
+let autosaveTimer;
+
+// ══ SICUREZZA — escape input utente prima di inserirlo nel DOM ══
+function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') : ''; }
+function v(id){ const e=document.getElementById(id); return e ? e.value.trim() : ''; }
+
+// ══ GOOGLE DRIVE DETECTION ══
+// Il banner è visibile di default (CSS). Lo nascondiamo SOLO se siamo
+// in un normale browser (window === window.top). Se Drive blocca JS
+// il banner resta visibile — comportamento corretto.
+(function(){
+  try {
+    if(window === window.top) {
+      document.getElementById('drive-banner').style.display = 'none';
+    }
+    // Se siamo in un iframe (Drive o altro) il banner rimane visibile.
+  } catch(e) {
+    // Cross-origin: siamo quasi certamente in Drive — banner rimane.
+  }
+})();
+
+// ══ NAVIGAZIONE ══
+function vaA(n){
+  document.getElementById('s'+sezioneAttuale).classList.remove('attiva');
+  sezioneAttuale = n;
+  document.getElementById('s'+n).classList.add('attiva');
+  aggiornaProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+  scheduleAutosave();
+}
+function aggiornaProgress(){
+  document.getElementById('progress-fill').style.width = ((sezioneAttuale-1)/5*100)+'%';
+  document.getElementById('progress-text').textContent = 'Sezione '+sezioneAttuale+' di 5';
+  document.querySelectorAll('.step-dot').forEach(d=>{
+    const s=parseInt(d.dataset.step);
+    d.classList.remove('active','done');
+    if(s===sezioneAttuale) d.classList.add('active');
+    else if(s<sezioneAttuale) d.classList.add('done');
+  });
+}
+
+// ══ HINTS ══
+function toggleHint(id){
+  const box = document.getElementById(id);
+  const btn = box.previousElementSibling;
+  if(!btn) return;
+  const aperto = box.classList.toggle('visibile');
+  btn.classList.toggle('aperto', aperto);
+  btn.textContent = aperto ? '✕ Chiudi' : '💡 Esempi';
+}
+
+// ══ FORM HELPERS ══
+function contaC(el, id){ const c=document.getElementById(id); if(c) c.textContent=el.value.length; scheduleAutosave(); }
+function selScale(id, v){ scala[id]=v; document.querySelectorAll('#'+id+' .scala-opzione').forEach((e,i)=>e.classList.toggle('selezionata',i+1===v)); scheduleAutosave(); }
+
+document.addEventListener('change', e=>{
+  const inp = e.target;
+  if(inp.type==='checkbox'||inp.type==='radio'){
+    const item = inp.closest('.check-item');
+    if(!item) return;
+    if(inp.type==='radio'){
+      document.querySelectorAll('input[name="'+inp.name+'"]').forEach(r=>{
+        r.closest('.check-item').classList.remove('selezionato');
+        r.closest('.check-item').querySelector('.check-icon').style.borderRadius='50%';
+      });
+      item.querySelector('.check-icon').style.borderRadius='50%';
+    }
+    item.classList.toggle('selezionato', inp.checked);
+    scheduleAutosave();
+  }
+});
+document.addEventListener('input', e=>{ if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') scheduleAutosave(); });
+
+// ══ RACCOLTA DATI ══
+function raccogliDati(){
+  const checked = sel => [...document.querySelectorAll(sel)].filter(i=>i.checked).map(i=>i.value);
+  const radio = n => { const e=document.querySelector('input[name="'+n+'"]:checked'); return e?e.value:''; };
+  return {
+    ecosistema_a_plus:true, fase:1, timestamp:new Date().toISOString(),
+    azienda:v('f1-azienda'), referente:v('f1-referente'), ruolo:v('f1-ruolo'),
+    email:v('f1-email'), sito:v('f1-sito'), anno_fondazione:v('f1-anno'), dimensione:radio('dim'),
+    descrizione:v('f2-descrizione'),
+    servizi:[v('f2-s1'),v('f2-s2'),v('f2-s3')].filter(Boolean),
+    settori:checked('#f2-settori input'), tipo_clienti:radio('clienti'),
+    competenze:[v('f3-c1'),v('f3-c2'),v('f3-c3')].filter(Boolean),
+    superpotere:v('f3-superpotere'), strumenti:v('f3-strumenti'),
+    scala_innovazione:scala['f3-innovazione']||null,
+    progetto:v('f4-progetto'), impatti:checked('#f4-impatti input'), replicabile:radio('replicabile'),
+    aspettative:[v('f5-a1'),v('f5-a2'),v('f5-a3')].filter(Boolean),
+    contributo:v('f5-contributo'), sogno:v('f5-sogno'),
+    scala_conoscenza:scala['f5-conoscenza']||null, note:v('f5-note')
+  };
+}
+
+// ══ GENERA CARTA ══
+function generaCarta(){
+  for(let i=1;i<=5;i++) document.getElementById('s'+i).classList.remove('attiva');
+  document.getElementById('intro-card').style.display='none';
+  document.getElementById('progress-text').textContent='Carta d\'Identità';
+  document.getElementById('progress-fill').style.width='100%';
+  document.querySelectorAll('.step-dot').forEach(d=>{d.classList.remove('active');d.classList.add('done');});
+
+  const d = raccogliDati();
+  const azienda = d.azienda||'[Azienda]';
+  document.getElementById('c-nome').textContent = azienda;
+  document.getElementById('c-referente').textContent = [d.referente,d.ruolo].filter(Boolean).join(' · ');
+  document.getElementById('c-contatti').textContent = [d.email,d.sito].filter(Boolean).join(' · ')+(d.anno_fondazione?' · Fondata '+d.anno_fondazione:'');
+  document.getElementById('c-sp').textContent = d.superpotere||'—';
+  document.getElementById('c-desc').textContent = d.descrizione||'—';
+  document.getElementById('c-strum').textContent = d.strumenti||'—';
+  document.getElementById('c-prog').textContent = d.progetto||'—';
+  document.getElementById('c-contr').textContent = d.contributo||'—';
+  document.getElementById('c-sogno').textContent = d.sogno||'—';
+  document.getElementById('c-footer').textContent = azienda+' · '+new Date().getFullYear();
+
+  renderTag('c-serv', d.servizi, false);
+  renderChecked('c-sett', '#f2-settori input', true);
+  renderTag('c-comp', d.competenze, true);
+  renderChecked('c-imp', '#f4-impatti input', true);
+
+  const listaEl = document.getElementById('c-asp');
+  listaEl.innerHTML='';
+  d.aspettative.forEach((a,i)=>{
+    const li=document.createElement('li');
+    const n=document.createElement('span'); n.className='asp-n'; n.textContent=i+1;
+    const t=document.createElement('span'); t.textContent=a;
+    li.appendChild(n); li.appendChild(t); listaEl.appendChild(li);
+  });
+
+  document.getElementById('carta-wrap').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  autosave();
+}
+function tornaAlForm(){
+  document.getElementById('carta-wrap').style.display='none';
+  document.getElementById('intro-card').style.display='block';
+  document.getElementById('json-fallback').style.display='none';
+  vaA(sezioneAttuale||5);
+}
+
+// ══ RENDER HELPERS ══
+function renderTag(id, arr, v){
+  const el=document.getElementById(id); el.innerHTML='';
+  if(!arr||!arr.length){el.textContent='—';return;}
+  arr.forEach(t=>{const s=document.createElement('span');s.className='tag'+(v?' v':'');s.textContent=t;el.appendChild(s);});
+}
+function renderChecked(id, sel, v){ renderTag(id,[...document.querySelectorAll(sel)].filter(i=>i.checked).map(i=>i.value),v); }
+
+// ══ PASSO 1: SCARICA JSON ══
+function scaricaJSON(){
+  const d = raccogliDati();
+  const nome = (d.azienda||'azienda').replace(/[^a-zA-Z0-9_-]/g,'_');
+  const referente = (d.referente||'').replace(/[^a-zA-Z0-9_-]/g,'_');
+  const filename = 'CartaIdentita_'+nome+'_'+referente+'_2026.json';
+  const content = JSON.stringify(d, null, 2);
+
+  try {
+    const blob = new Blob([content], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.cssText = 'position:fixed;top:-200px;left:-200px;opacity:0';
+    document.body.appendChild(a);
+    // setTimeout migliora affidabilità su iOS Safari
+    setTimeout(()=>{
+      a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+    }, 100);
+    segnaFatto(1);
+    toast('💾 JSON scaricato!');
+  } catch(e){
+    // Fallback: mostra testo copiabile
+    document.getElementById('json-fallback').style.display='block';
+    document.getElementById('json-text').value = content;
+    toast('Copia il testo JSON dal riquadro qui sotto');
+    segnaFatto(1);
+  }
+}
+
+// ══ PASSO 2: STAMPA PDF ══
+function stampaPDF(){
+  segnaFatto(2);
+  toast('Si apre la stampa — scegli "Salva come PDF"');
+  setTimeout(()=>window.print(), 300);
+}
+
+// ══ PASSO 3: EMAIL ══
+function inviaEmail(){
+  const d = raccogliDati();
+  const azienda = d.azienda||'[Azienda]';
+  const referente = d.referente||'';
+  const ruolo = d.ruolo||'';
+
+  if(!jsonFatto||!pdfFatto){
+    const avv = document.getElementById('avviso-passi');
+    if(avv){ avv.classList.add('visibile'); setTimeout(()=>avv.classList.remove('visibile'),4000); }
+  }
+
+  const oggetto = 'Carta d\'Identità Ecosistema A+ — '+azienda;
+  const corpo =
+    'Buongiorno Nicola,\n\n'+
+    'ti invio la Carta d\'Identità di '+azienda+' per l\'Ecosistema A+.\n\n'+
+    'In allegato:\n'+
+    '  📄  PDF — Carta d\'Identità (da stampare / archiviare)\n'+
+    '  💾  JSON — File dati strutturati (CartaIdentita_'+azienda.replace(/[^a-zA-Z0-9]/g,'_')+'_'+referente.replace(/[^a-zA-Z0-9]/g,'_')+'_2026.json)\n\n'+
+    '⚠️  RICORDA DI ALLEGARE I DUE FILE PRIMA DI INVIARE.\n\n'+
+    'Cordiali saluti,\n'+
+    [referente, ruolo].filter(Boolean).join(' · ')+'\n'+
+    azienda+'\n'+
+    (d.email||'');
+
+  const link = 'mailto:n.scapicchio@ewaycoop.it'+
+    '?subject='+encodeURIComponent(oggetto)+
+    '&body='+encodeURIComponent(corpo);
+
+  const a = document.createElement('a');
+  a.href = link;
+  a.style.cssText='position:fixed;top:-200px;opacity:0';
+  document.body.appendChild(a);
+  setTimeout(()=>{ a.click(); setTimeout(()=>document.body.removeChild(a),500); }, 50);
+}
+
+// ══ SEGNA PASSO FATTO ══
+function segnaFatto(passo){
+  if(passo===1) jsonFatto=true;
+  if(passo===2) pdfFatto=true;
+  const num = document.getElementById('num-'+passo);
+  const btn = passo===1 ? document.getElementById('btn-json') : document.getElementById('btn-pdf');
+  if(num){ num.classList.add('fatto'); num.textContent='✓'; }
+  if(btn){ btn.classList.add('fatto'); btn.textContent=(passo===1?'✓ JSON scaricato':'✓ PDF stampato'); btn.disabled=true; }
+}
+
+// ══ TOAST ══
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ══ AUTOSAVE ══
+function scheduleAutosave(){ clearTimeout(autosaveTimer); autosaveTimer=setTimeout(autosave,3000); }
+function autosave(){
+  try {
+    localStorage.setItem('ecoa_draft', JSON.stringify(raccogliDati()));
+    const bar=document.getElementById('autosave-bar');
+    bar.style.display='flex';
+    document.getElementById('autosave-testo').textContent='💾 Bozza salvata · '+new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  } catch(e){}
+}
+function cancellaAutosave(){
+  try{localStorage.removeItem('ecoa_draft');}catch(e){}
+  document.getElementById('autosave-bar').style.display='none';
+  toast('Bozza cancellata');
+}
+function caricaBozza(){
+  try {
+    const raw=localStorage.getItem('ecoa_draft');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    const s=(id,val)=>{const e=document.getElementById(id);if(e&&val!=null&&val!=='')e.value=val;};
+    s('f1-azienda',d.azienda);s('f1-referente',d.referente);s('f1-ruolo',d.ruolo);
+    s('f1-email',d.email);s('f1-sito',d.sito);s('f1-anno',d.anno_fondazione);
+    s('f2-descrizione',d.descrizione);
+    s('f2-s1',d.servizi&&d.servizi[0]);s('f2-s2',d.servizi&&d.servizi[1]);s('f2-s3',d.servizi&&d.servizi[2]);
+    s('f3-c1',d.competenze&&d.competenze[0]);s('f3-c2',d.competenze&&d.competenze[1]);s('f3-c3',d.competenze&&d.competenze[2]);
+    s('f3-superpotere',d.superpotere);s('f3-strumenti',d.strumenti);
+    s('f4-progetto',d.progetto);
+    s('f5-a1',d.aspettative&&d.aspettative[0]);s('f5-a2',d.aspettative&&d.aspettative[1]);s('f5-a3',d.aspettative&&d.aspettative[2]);
+    s('f5-contributo',d.contributo);s('f5-sogno',d.sogno);s('f5-note',d.note);
+    // Radio
+    const setR=(name,val)=>{ if(!val) return; const r=document.querySelector('input[name="'+name+'"][value="'+CSS.escape(val)+'"]'); if(r){r.checked=true;r.closest('.check-item').classList.add('selezionato');r.closest('.check-item').querySelector('.check-icon').style.borderRadius='50%';} };
+    setR('dim',d.dimensione);setR('clienti',d.tipo_clienti);setR('replicabile',d.replicabile);
+    // Checkbox
+    const setC=(sel,arr)=>{ if(!arr) return; arr.forEach(val=>{ const cb=document.querySelector(sel+'[value="'+CSS.escape(val)+'"]'); if(cb){cb.checked=true;cb.closest('.check-item').classList.add('selezionato');} }); };
+    setC('#f2-settori input',d.settori);setC('#f4-impatti input',d.impatti);
+    // Scale
+    if(d.scala_innovazione) selScale('f3-innovazione',d.scala_innovazione);
+    if(d.scala_conoscenza) selScale('f5-conoscenza',d.scala_conoscenza);
+    // Char counters
+    [['f2-descrizione','cnt-desc'],['f3-strumenti','cnt-strum'],['f4-progetto','cnt-prog'],
+     ['f5-contributo','cnt-contr'],['f5-sogno','cnt-sogno'],['f5-note','cnt-note']].forEach(([fid,cid])=>{
+      const fe=document.getElementById(fid),ce=document.getElementById(cid);
+      if(fe&&ce) ce.textContent=fe.value.length;
+    });
+    const bar=document.getElementById('autosave-bar');
+    bar.style.display='flex';
+    document.getElementById('autosave-testo').textContent='💾 Bozza ripristinata · '+(d.timestamp?new Date(d.timestamp).toLocaleDateString('it-IT'):'');
+  } catch(e){}
+}
+
+// ══ INIT ══
+aggiornaProgress();
+window.addEventListener('DOMContentLoaded', function(){
+  caricaBozza();
+  // Mostra banner configurazione se la key non è stata inserita
+  if(W3F_KEY === 'INSERISCI_QUI_IL_TUO_ACCESS_KEY') {
+    const cb = document.getElementById('config-banner');
+    if(cb) cb.style.display = 'block';
+    // Disabilita il pulsante di invio online e mostra avviso
+    const btn = document.getElementById('btn-invia-online');
+    if(btn) {
+      btn.title = 'Configura prima la Web3Forms access key';
+      btn.style.opacity = '0.5';
+      btn.onclick = function(){
+        toast('⚙️ Configura prima la Web3Forms key — vedi il banner in cima alla pagina');
+      };
+    }
+  }
+});
+</script>
+</body>
+</html>

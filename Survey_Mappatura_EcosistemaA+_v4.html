@@ -761,7 +761,7 @@ async function inviaOnline() {
     access_key: W3F_KEY,
     subject: "Carta d'Identità A+ — " + (d.azienda||'?') + ' — ' + (d.referente||'?'),
     from_name: (d.referente||'Partecipante') + ' (' + (d.azienda||'Azienda') + ')',
-    replyto: d.email || '',
+    ...(d.email ? { replyto: d.email } : {}),
     // ── Dati strutturati (ordinati come colonne template Excel) ──
     '01_Azienda':          d.azienda,
     '02_Referente':        d.referente,
@@ -797,6 +797,7 @@ async function inviaOnline() {
       body: JSON.stringify(payload)
     });
     const result = await res.json();
+    console.log('[Web3Forms]', res.status, result); // DEBUG
 
     if (result.success) {
       segnaFatto(3);
@@ -814,7 +815,7 @@ async function inviaOnline() {
     btn.textContent = '📡 Riprova l\'invio';
     stato.className = 'stato-err';
     stato.style.display = 'block';
-    stato.innerHTML = '⚠️ <strong>Invio non riuscito.</strong> Controlla la connessione e riprova, oppure usa il metodo email alternativo qui sotto.';
+    stato.innerHTML = '⚠️ <strong>Invio non riuscito.</strong> ' + (err.message ? '<br><small style="color:#666">Dettaglio: ' + err.message + '</small>' : '') + '<br>Controlla la connessione e riprova, oppure usa il metodo email alternativo qui sotto.';
     toast('⚠️ Errore: ' + (err.message||'connessione assente'));
   }
 }
